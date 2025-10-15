@@ -1,0 +1,12 @@
+@BeGamer_HostAddress = http://localhost:5254
+
+GET {{BeGamer_HostAddress}}/api/games
+Accept: application/json
+
+###
+
+POST {{BeGamer_HostAddress}}/api/games
+Accept: application/json
+{
+
+}
