@@ -10,20 +10,18 @@ namespace BeGamer.Mappers
         {
             if (gameEvent == null) return null;
 
-            return new GameEventDto
-            {
-                Id = gameEvent.Id,
-                Title = gameEvent.Title,
-                LocationId = gameEvent.LocationId,
-                DateEvent = gameEvent.DateEvent,
-                OrganizerId = gameEvent.OrganizerId,
-                MaxPlayers = gameEvent.MaxPlayers,
-                MinPlayers = gameEvent.MinPlayers,
-                RegistrationDeadline = gameEvent.RegistrationDeadline,
-                Note = gameEvent.note,
-                GameId = gameEvent.GameId,
-                // Pokud chceš, můžeš přidat např. Organizer.Name nebo Location.Address apod.
-            };
+            return new GameEventDto(
+                gameEvent.Id,
+                gameEvent.Title,
+                gameEvent.Location,
+                gameEvent.DateEvent,
+                gameEvent.OrganizerId,
+                gameEvent.MaxPlayers,
+                gameEvent.MinPlayers,
+                gameEvent.RegistrationDeadline,
+                gameEvent.Note,
+                gameEvent.GameId
+            );
         }
         public static IEnumerable<GameEventDto> ToDtoList(IEnumerable<GameEvent> gameEvents)
         {
@@ -37,10 +35,18 @@ namespace BeGamer.Mappers
             if (dto == null) return null;
             return new GameEvent
             {
-                Id = new Guid(),
+                Id = Guid.NewGuid(),
                 Title = dto.Title,
                 Location = dto.Location,
                 DateEvent = dto.DateEvent,
+                Organizer = null, // To be set in the service layer
+                OrganizerId = Guid.Empty, // To be set in the service layer
+                MaxPlayers = dto.MaxPlayers,
+                MinPlayers = dto.MinPlayers,
+                RegistrationDeadline = dto.RegistrationDeadline,
+                Note = dto.Note,
+                GameId = dto.GameId,
+                Game = null // To be set in the service layer or elsewhere
             };
         }
     }

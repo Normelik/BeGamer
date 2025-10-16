@@ -52,4 +52,53 @@ public class AppDbContext : DbContext
                     j.HasKey("GameEventId", "UserId");
                 });
     }
+
+    public static void Seed(AppDbContext context)
+    {
+        // Ověření, zda už jsou data přítomná
+        if (!context.Games.Any())
+        {
+            context.Games.AddRange(
+                new Game
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Catan",
+                    MinPlayers = 3,
+                    MaxPlayers = 4,
+                    Type = Enums.BoardGameType.Strategy
+                },
+                new Game
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Dixit",
+                    MinPlayers = 1,
+                    MaxPlayers = 12,
+                    Type = Enums.BoardGameType.Party
+                }
+            );
+        }
+        if (!context.Users.Any())
+        {
+            context.Users.AddRange(
+                new User
+                {
+                    Id = Guid.NewGuid(),
+                    Username = "john_doe",
+                    Password = "password123",
+                    Nickname = "Johnny"
+                },
+                new User
+                {
+                    Id = Guid.NewGuid(),
+                    Username = "jane_smith",
+                    Password = "securepass",
+                    Nickname = "Janie"
+                }
+            );
+        }
+        context.SaveChanges();
+    }
 }
+
+
+

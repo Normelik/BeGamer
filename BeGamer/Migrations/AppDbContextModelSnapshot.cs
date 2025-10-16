@@ -100,6 +100,9 @@ namespace BeGamer.Migrations
                     b.Property<int>("MinPlayers")
                         .HasColumnType("int");
 
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OrganizerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -107,10 +110,6 @@ namespace BeGamer.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("note")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

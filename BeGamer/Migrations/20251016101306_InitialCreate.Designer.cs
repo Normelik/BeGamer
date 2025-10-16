@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeGamer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251015075311_InitalCreate")]
-    partial class InitalCreate
+    [Migration("20251016101306_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -103,6 +103,9 @@ namespace BeGamer.Migrations
                     b.Property<int>("MinPlayers")
                         .HasColumnType("int");
 
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OrganizerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -110,10 +113,6 @@ namespace BeGamer.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("note")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

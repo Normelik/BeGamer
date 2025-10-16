@@ -5,7 +5,7 @@ namespace BeGamer.DTOs
     public record GameEventDto(
       Guid Id,
       string Title,
-      Address LocationId, // Address Id
+      Address Location,
       DateTime DateEvent,
       Guid OrganizerID, // User Id
       int MaxPlayers,

@@ -2,7 +2,6 @@
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace MyApp.Controllers;
 
@@ -11,28 +10,21 @@ namespace MyApp.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IJwtTokenService _jwtTokenService;
 
-    public AuthController(IJwtTokenService jwtTokenService)
+    private readonly IAuthService _authService;
+    public AuthController(IAuthService authService)
     {
-        _jwtTokenService = jwtTokenService;
+        _authService = authService;
     }
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDTO loginData)
     {
-        // Tady bys měl mít reálnou validaci uživatele
-        if (loginData.Username == "admin" && loginData.Password == "password")
+        if (loginData == null || string.IsNullOrEmpty(loginData.Username) || string.IsNullOrEmpty(loginData.Password))
         {
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Name, loginData.Username),
-                new Claim(ClaimTypes.Role, "Admin")
-            };
-
-            var token = _jwtTokenService.GenerateToken(claims);
-            return Ok(new { Token = token });
+            return BadRequest("Invalid login data.");
         }
+        _authService.Login(loginData.Username, loginData.Password);
 
         return Unauthorized();
     }

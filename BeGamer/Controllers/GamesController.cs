@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using BeGamer.Data;
 using BeGamer.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BeGamer.Controllers
 {
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class GamesController : ControllerBase
