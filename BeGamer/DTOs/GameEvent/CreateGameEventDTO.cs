@@ -1,6 +1,6 @@
 ﻿using BeGamer.Models;
 
-namespace BeGamer.DTOs
+namespace BeGamer.DTOs.GameEvent
 {
     public record CreateGameEventDto(
     string Title,

@@ -1,5 +1,4 @@
-﻿using BeGamer.DTOs;
-using BeGamer.Services.Interfaces;
+﻿using BeGamer.Services.Interfaces;
 using System.Security.Claims;
 
 namespace BeGamer.Services

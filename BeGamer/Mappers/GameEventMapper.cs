@@ -1,6 +1,5 @@
-﻿using BeGamer.DTOs;
+﻿using BeGamer.DTOs.GameEvent;
 using BeGamer.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace BeGamer.Mappers
 {

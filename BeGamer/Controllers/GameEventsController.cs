@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BeGamer.Services;
-using BeGamer.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using BeGamer.Services.Interfaces;
+using BeGamer.DTOs.GameEvent;
 
 namespace BeGamer.Controllers
 {

@@ -1,4 +1,4 @@
-﻿namespace BeGamer.DTOs
+﻿namespace BeGamer.DTOs.User
 {
     public record UserDTO(
         Guid Id,

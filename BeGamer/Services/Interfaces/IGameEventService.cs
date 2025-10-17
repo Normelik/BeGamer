@@ -1,6 +1,4 @@
-﻿
-
-using BeGamer.DTOs;
+﻿using BeGamer.DTOs.GameEvent;
 
 namespace BeGamer.Services.Interfaces
 {

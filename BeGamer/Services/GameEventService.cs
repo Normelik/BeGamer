@@ -1,5 +1,5 @@
 ﻿using BeGamer.Data;
-using BeGamer.DTOs;
+using BeGamer.DTOs.GameEvent;
 using BeGamer.Mappers;
 using BeGamer.Models;
 using BeGamer.Services.Interfaces;

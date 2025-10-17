@@ -1,5 +1,4 @@
-﻿using BeGamer.DTOs;
-using BeGamer.Models;
+﻿using BeGamer.DTOs.User;
 
 namespace BeGamer.Services.Interfaces
 {
@@ -7,8 +6,10 @@ namespace BeGamer.Services.Interfaces
     {
         Task<IEnumerable<UserDTO>> GetAllUsers();
         Task<UserDTO> GetUserById(Guid id);
-        Task<UserDTO> CreateUser(UserDTO userDto);
-        Task<UserDTO> UpdateUser(Guid id, UserDTO userDto);
+        Task<UserDTO> CreateUserAsync(CreateUserDTO createUserDTO);
+        Task<UserDTO> UpdateUser(Guid id, UpdateUserDTO updateUserDTO);
         Task<bool> DeleteUser(Guid id);
+
+        Task<bool> UserExistsById(Guid id);
     }
 }

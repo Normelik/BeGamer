@@ -1,5 +1,4 @@
 ﻿using BeGamer.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace BeGamer.Models
 {
@@ -14,7 +13,7 @@ namespace BeGamer.Models
         public int MaxPlayers { get; set; }
 
         public BoardGameType Type { get; set; }
-        public List<GameEvent>? Events { get; set; } = new List<GameEvent>();
+        public List<GameEvent>? Events { get; set; } = [];
 
     }
 }
