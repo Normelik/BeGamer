@@ -2,7 +2,7 @@
 
 namespace BeGamer.DTOs.GameEvent
 {
-    public record CreateGameEventDto(
+    public record CreateGameEventDTO(
     string Title,
     Address Location,
     DateTime DateEvent,

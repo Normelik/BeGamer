@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BeGamer.DTOs.GameEvent;
+using BeGamer.DTOs.User;
+using BeGamer.Models;
 using BeGamer.Services;
-using Microsoft.AspNetCore.Authorization;
 using BeGamer.Services.Interfaces;
-using BeGamer.DTOs.GameEvent;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BeGamer.Controllers
 {
@@ -11,94 +13,135 @@ namespace BeGamer.Controllers
     [ApiController]
     public class GameEventsController : ControllerBase
     {
-        private readonly IGameEventService GameEventService;
+        private readonly IGameEventService _gameEventService;
+        private readonly ILogger<GameEventsController> _logger;
 
-        public GameEventsController(IGameEventService GameEventService)
+        public GameEventsController(IGameEventService GameEventService, ILogger<GameEventsController> logger)
         {
-            this.GameEventService = GameEventService;
+            _gameEventService = GameEventService;
+            _logger = logger;
         }
 
         // GET: api/GameEvents
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GameEventDto>>> GetGameEvents()
+        public async Task<ActionResult<IEnumerable<GameEventDTO>>> GetGameEvents()
         {
-          
-            return Ok(await GameEventService.GetAllEvents());
+            _logger.LogInformation("API request received to get all GameEvents.");
+
+            try
+            {
+                var gameEvents = await _gameEventService.GetAllGameEventsAsync();
+
+                _logger.LogInformation("Successfully returned {Count} GameEvents.", gameEvents.Count());
+                return Ok(gameEvents);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving GameEvents.");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
 
-        // GET: api/GameEvents/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<GameEvent>> GetGameEvent(Guid id)
-        //{
-        //    var gameEvent = await _context.GameEvents.FindAsync(id);
+        // GET: api/GameEvents/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<GameEventDTO>> GetGameEventById(Guid id)
+        {
+            _logger.LogInformation("API request received to get GameEvent with ID: {GameEventId}", id);
 
-        //    if (gameEvent == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var gameEvent = await _gameEventService.GetGameEventById(id);
 
-        //    return gameEvent;
-        //}
+            if (gameEvent == null)
+            {
+                _logger.LogWarning("API request: GameEvent with ID: {GameEventId} not found.", id);
+                return NotFound();
+            }
 
-        //// PUT: api/GameEvents/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutGameEvent(Guid id, GameEvent gameEvent)
-        //{
-        //    if (id != gameEvent.Id)
-        //    {
-        //        return BadRequest();
-        //    }
+            _logger.LogInformation("API request: GameEvent with ID: {GameEventId} returned successfully.", id);
+            return Ok(gameEvent);
+        }
 
-        //    _context.Entry(gameEvent).State = EntityState.Modified;
+        // PUT: api/GameEvents/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutGameEvent(GameEventDTO gameEventDTO)
+        {
+            if(gameEventDTO == null)
+            {
+                _logger.LogWarning("GameEventDTO is null. Cannot update GameEvent.");
+                return BadRequest("Wrong GameEvent data were provided.");
+            }
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!GameEventExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+            try
+            {
+                await _gameEventService.UpdateGameEvent(gameEventDTO.Id, gameEventDTO);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating GameEvent with ID: {GameEventId}", gameEventDTO.Id);
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
         // POST: api/GameEvents
         [HttpPost]
-        public async Task<ActionResult<GameEventDto>> PostGameEvent(CreateGameEventDto gameEvent)
+        public async Task<ActionResult<GameEventDTO>> PostGameEvent(CreateGameEventDTO createGameEventDTO)
         {
-      
+            _logger.LogInformation("API request received to create a new GameEvent.");
 
-            return Created(nameof(GetGameEvents), await GameEventService.CreateEvent(gameEvent));
+            // Input validation (basic, controller-level)
+            if (createGameEventDTO == null)
+            {
+                _logger.LogWarning("CreateGameEventDTO is null. Cannot create GameEvent.");
+                return BadRequest("Wrong GameEvent data were provided.");
+            }
+
+            try
+            {
+                var GameEvent = await _gameEventService.CreateGameEvent(createGameEventDTO);
+
+                if (GameEvent == null)
+                {
+                    _logger.LogWarning("GameEvent creation failed. Service returned null.");
+                    return StatusCode(500, "Failed to create GameEvent.");
+                }
+
+                _logger.LogInformation("GameEvent with ID {GameEventId} was successfully created.", GameEvent.Id);
+                return CreatedAtAction(nameof(GetGameEventById), new { id = GameEvent.Id }, GameEvent);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating a new GameEvent.");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
 
-        //// DELETE: api/GameEvents/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteGameEvent(int id)
-        //{
-        //    var gameEvent = await _context.GameEvents.FindAsync(id);
-        //    if (gameEvent == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // DELETE: api/GameEvents/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteGameEvent(Guid id)
+        {
+            _logger.LogInformation("API request received to delete GameEvent with ID: {GameEventId}", id);
 
-        //    _context.GameEvents.Remove(gameEvent);
-        //    await _context.SaveChangesAsync();
+            try
+            {
+                var success = await _gameEventService.DeleteGameEvent(id);
 
-        //    return NoContent();
-        //}
-
-        //private bool GameEventExists(Guid id)
-        //{
-        //    return _context.GameEvents.Any(x => x.Id == id);
-        //}
+                if (success)
+                {
+                    _logger.LogInformation("GameEvent with ID: {GameEventId} was successfully deleted.", id);
+                    return NoContent();
+                }
+                else
+                {
+                    _logger.LogWarning("GameEvent with ID: {GameEventId} not found. Delete operation aborted.", id);
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while attempting to delete GameEvent with ID: {GameEventId}", id);
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
     }
 }

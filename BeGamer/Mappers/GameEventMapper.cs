@@ -5,11 +5,11 @@ namespace BeGamer.Mappers
 {
     public class GameEventMapper
     {
-        public static GameEventDto ToDto(GameEvent gameEvent)
+        public GameEventDTO ToDTO(GameEvent gameEvent)
         {
             if (gameEvent == null) return null;
 
-            return new GameEventDto(
+            return new GameEventDTO(
                 gameEvent.Id,
                 gameEvent.Title,
                 gameEvent.Location,
@@ -22,19 +22,18 @@ namespace BeGamer.Mappers
                 gameEvent.GameId
             );
         }
-        public static IEnumerable<GameEventDto> ToDtoList(IEnumerable<GameEvent> gameEvents)
+        public IEnumerable<GameEventDTO> ToDtoList(IEnumerable<GameEvent> gameEvents)
         {
-            if (gameEvents == null) return Enumerable.Empty<GameEventDto>();
+            if (gameEvents == null) return Enumerable.Empty<GameEventDTO>();
 
-            return gameEvents.Select(e => ToDto(e));
+            return gameEvents.Select(e => ToDTO(e));
         }
 
-        public static GameEvent toEntity(CreateGameEventDto dto)
+        public GameEvent ToEntity(CreateGameEventDTO dto)
         {
             if (dto == null) return null;
             return new GameEvent
             {
-                Id = Guid.NewGuid(),
                 Title = dto.Title,
                 Location = dto.Location,
                 DateEvent = dto.DateEvent,

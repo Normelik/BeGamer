@@ -1,9 +1,12 @@
-﻿namespace BeGamer.Services.Interfaces
+﻿using BeGamer.DTOs;
+using BeGamer.DTOs.User;
+
+namespace BeGamer.Services.Interfaces
 {
     public interface IAuthService
     {
 
-        string Login(string username, string password);
-        string Register(string username, string password);
+        string Login(LoginDTO loginDTO);
+        string Register(CreateUserDTO registerUserDTO);
     }
 }

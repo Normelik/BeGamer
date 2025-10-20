@@ -2,7 +2,7 @@
 
 namespace BeGamer.DTOs.GameEvent
 {
-    public record GameEventDto(
+    public record GameEventDTO(
       Guid Id,
       string Title,
       Address Location,

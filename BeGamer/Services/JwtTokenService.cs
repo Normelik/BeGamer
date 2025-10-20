@@ -31,4 +31,12 @@ public class JwtTokenService : IJwtTokenService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public string ExtractUserIdFromToken(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        return userIdClaim?.Value ?? string.Empty;
+    }
 }

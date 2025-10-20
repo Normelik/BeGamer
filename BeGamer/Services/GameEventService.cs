@@ -3,76 +3,204 @@ using BeGamer.DTOs.GameEvent;
 using BeGamer.Mappers;
 using BeGamer.Models;
 using BeGamer.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace BeGamer.Services
 {
     public class GameEventService : IGameEventService
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<GameEventService> _logger;
+        private readonly GameEventMapper _gameEventMapper;
+        private readonly IUserService _userService;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public GameEventService(AppDbContext context)
+        public GameEventService(AppDbContext context, ILogger<GameEventService> logger, GameEventMapper gameEventMapper, IUserService userService, IJwtTokenService jwtTokenService)
         {
             _context = context;
+            _logger = logger;
+            _gameEventMapper = gameEventMapper;
+            _userService = userService;
+            _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<GameEventDto> CreateEvent(CreateGameEventDto createGameEventDto)
+        // CREATE EVENT
+        public async Task<GameEventDTO> CreateGameEvent(CreateGameEventDTO createGameEventDTO)
         {
-            if (createGameEventDto == null)
+            _logger.LogInformation("Start creating new GameEvent.");
+
+            
+            try
             {
-                throw new ArgumentNullException(nameof(createGameEventDto));
+                var gameEvent = _gameEventMapper.ToEntity(createGameEventDTO);
+
+                gameEvent.Id = Guid.NewGuid(); // Assign a new GUID
+                // Check the originality of the generated GUID
+                while (true)
+                {
+                    if (!GameEventExistsById(gameEvent.Id)) break;
+                    gameEvent.Id = Guid.NewGuid();
+                }
+                // extract organizer from token temporary hardcoded
+                //gameEvent.OrganizerId = _jwtTokenService.ExtractUserIdFromToken();
+                gameEvent.Organizer = _context.Users.FirstOrDefault(u => u.Id == gameEvent.OrganizerId);
+
+
+                await _context.GameEvents.AddAsync(gameEvent);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("GameEvent with ID: {GameEventId} successfully created.", gameEvent.Id);
+
+                return _gameEventMapper.ToDTO(gameEvent);
             }
-            //GameEvent newie = new GameEvent();
-            //newie.Id = Guid.NewGuid();
-            GameEvent newie = new GameEvent
+            catch (Exception ex)
             {
-                Id = Guid.NewGuid(),
-                Title = createGameEventDto.Title,
-                Location = createGameEventDto.Location,
-                DateEvent = createGameEventDto.DateEvent,
-                Organizer = null, // To be set in the service layer
-                OrganizerId = Guid.Empty, // To be set in the service layer
-                MaxPlayers = createGameEventDto.MaxPlayers,
-                MinPlayers = createGameEventDto.MinPlayers,
-                RegistrationDeadline = createGameEventDto.RegistrationDeadline,
-                Note = createGameEventDto.Note,
-                GameId = createGameEventDto.GameId,
-                Game = null // To be set in the service layer or elsewhere
-            };
-            await _context.GameEvents.AddAsync(newie);
-
-            //GameEvent newEvent = GameEventMapper.toEntity(createGameEventDto);
-            //await _context.GameEvents.AddAsync(newEvent);
-            await _context.SaveChangesAsync();
-            return GameEventMapper.ToDto(newie);
-        }
-
-        public Task<bool> DeleteEvent(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<GameEventDto>> GetAllEvents()
-        {
-            var existingEvents = await _context.GameEvents.ToListAsync();
-
-            if (existingEvents.IsNullOrEmpty())
-            {
-                return Enumerable.Empty<GameEventDto>();
+                _logger.LogError(ex, "An error occurred while creating a new GameEvent.");
+                throw;
             }
-
-            return GameEventMapper.ToDtoList(existingEvents);
         }
 
-        public Task<GameEventDto> GetEventById(Guid id)
+        // GET ALL EVENTS
+        public async Task<IEnumerable<GameEventDTO>> GetAllGameEventsAsync()
         {
-            throw new NotImplementedException();
+
+            _logger.LogInformation("Fetching all GameEvents from the database.");
+
+            try
+            {
+                var gameEvents = await _context.GameEvents.ToListAsync();
+                _logger.LogInformation("Fetched {Count} GameEvents from the database.", gameEvents.Count);
+
+                if (gameEvents.IsNullOrEmpty())
+                {
+                    return Enumerable.Empty<GameEventDTO>();
+                }
+
+                return _gameEventMapper.ToDtoList(gameEvents);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching gameEvents.");
+                throw;
+            }
         }
 
-        public Task<bool> UpdateEvent(Guid id, GameEventDto gameEventDto)
+        // GET EVENT BY ID
+        public async Task<GameEventDTO> GetGameEventById(Guid id)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Fetching GameEvent with ID: {GameEventId}", id);
+
+            try
+            {
+                GameEventExistsById(id); // Check if GameEvents exists
+
+                var gameEvent = await _context.GameEvents.FirstOrDefaultAsync(u => u.Id == id);
+
+                if (gameEvent == null)
+                {
+                    _logger.LogWarning("GameEvent with ID: {GameEventId} not found.", id);
+                    return null;
+                }
+
+                _logger.LogInformation("GameEvent with ID: {GameEventId} successfully fetched.", id);
+                return _gameEventMapper.ToDTO(gameEvent);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching user with ID: {UserId}", id);
+                throw;
+            }
+        }
+
+        // UPDATE EVENT
+        public async Task<GameEventDTO> UpdateGameEvent(Guid id, GameEventDTO gameEventDto)
+        {
+            _logger.LogInformation("Attempting to update GameEvent with ID: {GameEventId}", id);
+            
+            try
+            {
+                GameEventExistsById(id); // Check if GameEvent exists
+
+                var gameEvent = await _context.GameEvents.FirstOrDefaultAsync(u => u.Id == id);
+
+                if (gameEvent == null)
+                {
+                    _logger.LogWarning("GameEvent with ID: {GameEventId} not found.", id);
+                    return null;
+                }
+
+                _logger.LogInformation("GameEvent with ID: {GameEventId} found. Updating fields...", id);
+
+                // Buď ručně:
+                gameEvent.Title = gameEventDto.Title;
+                gameEvent.Location = gameEventDto.Location;
+                gameEvent.DateEvent = gameEventDto.DateEvent;
+                gameEvent.MaxPlayers = gameEventDto.MaxPlayers;
+                gameEvent.MinPlayers = gameEventDto.MinPlayers;
+                gameEvent.RegistrationDeadline = gameEventDto.RegistrationDeadline;
+                gameEvent.Note = gameEventDto.Note;
+                gameEvent.GameId = gameEventDto.GameId;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("GameEvent with ID: {GameEventId} successfully updated.", id);
+
+                return _gameEventMapper.ToDTO(gameEvent);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating GameEvent with ID: {GameEventId}", id);
+                throw; 
+            }
+        }
+
+        // DELETE EVENT
+        public async Task<bool> DeleteGameEvent(Guid id)
+        {
+            try
+            {
+                GameEventExistsById(id); // Check if GameEvent exists
+
+                var gameEvent = await _context.GameEvents.FindAsync(id);
+
+                if (gameEvent is null)
+                {
+                    _logger.LogWarning("GameEvent with ID {GameEventId} not found for deletion.", id);
+                    return false;
+                }
+
+                _context.GameEvents.Remove(gameEvent);
+
+                var changes = await _context.SaveChangesAsync();
+
+
+                if (changes > 0)
+                {
+                    _logger.LogInformation("GameEvent with ID {GameEventId} successfully deleted.", id);
+                    return true;
+                }
+                else
+                {
+                    _logger.LogWarning("GameEvent with ID {GameEventId} was found but no changes were saved.", id);
+                    return false;
+                }
+            }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, "Database update error while deleting GameEvent with ID {GameEventId}.", id);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while deleting GameEvent with ID {GameEventId}.", id);
+                return false;
+            }
+        }
+        private bool GameEventExistsById(Guid id)
+        {
+            return _context.GameEvents.Any(e => e.Id == id);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using BeGamer.Services.Interfaces;
+﻿using BeGamer.DTOs;
+using BeGamer.DTOs.User;
+using BeGamer.Services.Interfaces;
+using Microsoft.Identity.Client;
 using System.Security.Claims;
 
 namespace BeGamer.Services
@@ -6,32 +9,38 @@ namespace BeGamer.Services
     public class AuthService : IAuthService
     {
         private readonly IJwtTokenService _jwtTokenService;
-        public AuthService(IJwtTokenService jwtTokenService)
+        private readonly IUserService _userService;
+        public AuthService(IJwtTokenService jwtTokenService, IUserService userService)
         {
             _jwtTokenService = jwtTokenService;
+            _userService = userService;
         }
 
-        public string Login(string username,
-                            string password)
+        public string Login(LoginDTO loginDTO)
         {
-            // Tady bys měl mít reálnou validaci uživatele
-            if (username == "admin" && password == "password")
-            {
-                var claims = new[]
-                {
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, "Admin")
-            };
-
-                var token = _jwtTokenService.GenerateToken(claims);
-                return token;
-            }
+           
+           
             return null;
         }
 
-        public string Register(string username, string password)
+        public string Register(CreateUserDTO registerUserDTO)
         {
-            throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(registerUserDTO.Username) && !string.IsNullOrEmpty(registerUserDTO.Password))
+            {
+                _userService.CreateUserAsync(registerUserDTO).Wait();
+
+            }
+            // Po úspěšné registraci můžeš rovnou přihlásit uživatele
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, registerUserDTO.Username),
+                new Claim(ClaimTypes.Role, "User")
+            };
+            var token = _jwtTokenService.GenerateToken(claims);
+           
+
+                return token;
+            
         }
     }
 }

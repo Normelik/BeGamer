@@ -1,6 +1,8 @@
 ﻿using BeGamer.Data;
+using BeGamer.DTOs;
 using BeGamer.DTOs.User;
 using BeGamer.Mappers;
+using BeGamer.Models;
 using BeGamer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,17 +14,13 @@ namespace BeGamer.Services
         private readonly UserMapper _userMapper;
         private readonly ILogger<UserService> _logger;
 
-        public UserService(AppDbContext context,UserMapper userMapper, ILogger<UserService> logger)
+        public UserService(AppDbContext context, UserMapper userMapper, ILogger<UserService> logger)
         {
             _context = context;
             _userMapper = userMapper;
             _logger = logger;
         }
-        public Task<UserDTO> CreateUser(UserDTO userDto)
-        { 
-            throw new NotImplementedException();
-        }
-        
+
         //CREATE USER
         public async Task<UserDTO> CreateUserAsync(CreateUserDTO createUserDTO)
         {
@@ -33,8 +31,9 @@ namespace BeGamer.Services
                 user.Id = Guid.NewGuid(); // Assign a new GUID
 
                 // Check the originality of the generated GUID
-                while (true) {
-                    if (await UserExistsById(user.Id)) break;
+                while (true)
+                {
+                    if (UserExistsById(user.Id)) break;
                     user.Id = Guid.NewGuid();
                 }
                 await _context.Users.AddAsync(user);
@@ -51,7 +50,7 @@ namespace BeGamer.Services
         }
 
         //GET ALL USERS
-        public async Task<IEnumerable<UserDTO>> GetAllUsers()
+        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
             _logger.LogInformation("Fetching all users from the database.");
 
@@ -69,14 +68,14 @@ namespace BeGamer.Services
             }
         }
 
-        // GET USER
+        // GET USER BY ID
         public async Task<UserDTO> GetUserById(Guid id)
         {
             _logger.LogInformation("Fetching user with ID: {UserId}", id);
 
             try
             {
-                await UserExistsById(id); // Check if user exists
+                UserExistsById(id); // Check if user exists
 
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
@@ -117,9 +116,6 @@ namespace BeGamer.Services
                 user.Username = updateUserDTO.Username;
                 user.Nickname = updateUserDTO.Nickname;
 
-                // nebo pomocí mapperu:
-                // _mapper.Map(updateUserDTO, user);
-
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation("User with ID: {UserId} successfully updated.", id);
@@ -129,7 +125,7 @@ namespace BeGamer.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating user with ID: {UserId}", id);
-                throw; // přeposílá výjimku dál
+                throw;
             }
         }
 
@@ -176,9 +172,34 @@ namespace BeGamer.Services
             }
         }
 
-        public async Task<bool> UserExistsById(Guid id)
+        public bool UserExistsById(Guid id)
         {
-            return await _context.Users.AnyAsync(e => e.Id == id);
+            return _context.Users.Any(e => e.Id == id);
+        }
+
+        public User GetUserAsOrganizer(Guid id)
+        {
+            try
+            {
+
+                // Check if user exists
+                UserExistsById(id);
+                var user = _context.Users
+                    .Include(u => u.OrganizedEvents)
+                    .FirstOrDefault(u => u.Id == id);
+                if (user == null)
+                {
+                    _logger.LogWarning("User with ID: {UserId} not found.", id);
+                    return null;
+                }
+                _logger.LogInformation("User with ID: {UserId} successfully fetched as organizer.", id);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching user as organizer with ID: {UserId}", id);
+                throw;
+            }
         }
     }
 }

@@ -67,7 +67,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var users = await _userService.GetAllUsers();
+                var users = await _userService.GetAllUsersAsync();
 
                 _logger.LogInformation("Successfully returned {Count} users.", users.Count());
                 return Ok(users);
@@ -79,7 +79,7 @@ namespace BeGamer.Controllers
             }
         }
 
-        // GET: api/Users/5
+        // GET: api/Users/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUser(Guid id)
         {
@@ -110,7 +110,7 @@ namespace BeGamer.Controllers
             }
 
             // Check if user exists
-            if (!await _userService.UserExistsById(id))
+            if (!_userService.UserExistsById(id))
             {
                 _logger.LogWarning("User with ID {UserId} not found. Update aborted.", id);
                 return NotFound(new { message = $"User with ID {id} was not found for update." });
@@ -141,7 +141,7 @@ namespace BeGamer.Controllers
             }
         }
 
-        // DELETE: api/Users/5
+        // DELETE: api/Users/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
