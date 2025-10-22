@@ -7,7 +7,7 @@ namespace BeGamer.DTOs.GameEvent
       string Title,
       Address Location,
       DateTime DateEvent,
-      Guid OrganizerID, // User Id
+      string OrganizerID, // CustomUser Id
       int MaxPlayers,
       int MinPlayers,
       DateOnly RegistrationDeadline,

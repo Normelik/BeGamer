@@ -1,22 +1,23 @@
 ﻿namespace BeGamer.Data;
 
 using BeGamer.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-public class AppDbContext : DbContext
+
+public class AppDbContext : IdentityDbContext<CustomUser>
 {
     public DbSet<Game> Games { get; set; }
     public DbSet<GameEvent> GameEvents { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<Address> Addresses { get; set; }
 
-    public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options)
+
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         // 1:N Organizer - GameEvents
         modelBuilder.Entity<GameEvent>()
             .HasOne(e => e.Organizer)
@@ -38,9 +39,9 @@ public class AppDbContext : DbContext
             .UsingEntity<Dictionary<string, object>>(  // implicitní spojovací tabulka
                 "GameEventParticipant",
                 j => j
-                    .HasOne<User>()
+                    .HasOne<CustomUser>()
                     .WithMany()
-                    .HasForeignKey("UserId")
+                    .HasForeignKey("Id")
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne<GameEvent>()
@@ -49,7 +50,7 @@ public class AppDbContext : DbContext
                     .OnDelete(DeleteBehavior.Cascade),
                 j =>
                 {
-                    j.HasKey("GameEventId", "UserId");
+                    j.HasKey("GameEventId", "Id");
                 });
     }
 
@@ -71,27 +72,35 @@ public class AppDbContext : DbContext
                 {
                     Id = Guid.NewGuid(),
                     Title = "Dixit",
-                    MinPlayers = 1,
-                    MaxPlayers = 12,
+                    MinPlayers = 3,
+                    MaxPlayers = 6,
                     Type = Enums.BoardGameType.Party
+                },
+                new Game
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Pandemic",
+                    MinPlayers = 2,
+                    MaxPlayers = 4,
+                    Type = Enums.BoardGameType.Cooperative
                 }
             );
         }
         if (!context.Users.Any())
         {
             context.Users.AddRange(
-                new User
+                new CustomUser
                 {
-                    Id = Guid.NewGuid(),
-                    Username = "john_doe",
-                    Password = "password123",
+                    Id = Guid.NewGuid().ToString(),
+                    UserName = "john_doe",
+                    PasswordHash = "password123",
                     Nickname = "Johnny"
                 },
-                new User
+                new CustomUser
                 {
-                    Id = Guid.NewGuid(),
-                    Username = "jane_smith",
-                    Password = "securepass",
+                    Id = Guid.NewGuid().ToString(),
+                    UserName = "jane_smith",
+                    PasswordHash = "securepass",
                     Nickname = "Janie"
                 }
             );

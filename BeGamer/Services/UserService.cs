@@ -28,13 +28,14 @@ namespace BeGamer.Services
             try
             {
                 var user = _userMapper.ToModel(createUserDTO);
-                user.Id = Guid.NewGuid(); // Assign a new GUID
+                user.Id = Guid.NewGuid().ToString(); // Assign a new GUID
 
                 // Check the originality of the generated GUID
                 while (true)
                 {
-                    if (UserExistsById(user.Id)) break;
-                    user.Id = Guid.NewGuid();
+                    
+                    if (!UserExistsById(user.Id)) break;
+                    user.Id = Guid.NewGuid().ToString();
                 }
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
@@ -69,7 +70,7 @@ namespace BeGamer.Services
         }
 
         // GET USER BY ID
-        public async Task<UserDTO> GetUserById(Guid id)
+        public async Task<UserDTO> GetUserById(string id)
         {
             _logger.LogInformation("Fetching user with ID: {UserId}", id);
 
@@ -96,7 +97,7 @@ namespace BeGamer.Services
         }
 
         // UPDATE USER
-        public async Task<UserDTO> UpdateUser(Guid id, UpdateUserDTO updateUserDTO)
+        public async Task<UserDTO> UpdateUser(string id, UpdateUserDTO updateUserDTO)
         {
             _logger.LogInformation("Attempting to update user with ID: {UserId}", id);
 
@@ -113,7 +114,7 @@ namespace BeGamer.Services
                 _logger.LogInformation("User with ID: {UserId} found. Updating fields...", id);
 
                 // Buď ručně:
-                user.Username = updateUserDTO.Username;
+                user.UserName = updateUserDTO.Username;
                 user.Nickname = updateUserDTO.Nickname;
 
                 await _context.SaveChangesAsync();
@@ -130,7 +131,7 @@ namespace BeGamer.Services
         }
 
         // DELETE USER
-        public async Task<bool> DeleteUser(Guid id)
+        public async Task<bool> DeleteUser(string id)
         {
             try
             {
@@ -172,12 +173,12 @@ namespace BeGamer.Services
             }
         }
 
-        public bool UserExistsById(Guid id)
+        public bool UserExistsById(string id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _context.Users.Any(u => u.Id == id);
         }
 
-        public User GetUserAsOrganizer(Guid id)
+        public CustomUser GetUserAsOrganizer(string id)
         {
             try
             {

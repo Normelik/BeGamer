@@ -38,7 +38,7 @@ namespace BeGamer.Mappers
                 Location = dto.Location,
                 DateEvent = dto.DateEvent,
                 Organizer = null, // To be set in the service layer
-                OrganizerId = Guid.Empty, // To be set in the service layer
+                OrganizerId = "", // To be set in the service layer
                 MaxPlayers = dto.MaxPlayers,
                 MinPlayers = dto.MinPlayers,
                 RegistrationDeadline = dto.RegistrationDeadline,

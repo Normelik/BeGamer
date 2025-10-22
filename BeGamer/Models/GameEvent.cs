@@ -12,10 +12,9 @@
 
         public DateTime DateEvent { get; set; }
 
-        public User? Organizer { get; set; }
-        public Guid OrganizerId { get; set; }
+        public string OrganizerId { get; set; }
 
-        public List<User> Participants { get; set; } = [];
+        public List<CustomUser> Participants { get; set; } = [];
 
 
         public int MaxPlayers { get; set; }
@@ -25,7 +24,6 @@
 
         public string? Note { get; set; }
 
-        public required Game Game { get; set; }
         public Guid GameId { get; set; }
     }
 }

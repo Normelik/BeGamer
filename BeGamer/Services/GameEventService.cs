@@ -3,6 +3,7 @@ using BeGamer.DTOs.GameEvent;
 using BeGamer.Mappers;
 using BeGamer.Models;
 using BeGamer.Services.Interfaces;
+using BeGamer.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,14 +18,16 @@ namespace BeGamer.Services
         private readonly GameEventMapper _gameEventMapper;
         private readonly IUserService _userService;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly GuidGenerator _guidGenerator;
 
-        public GameEventService(AppDbContext context, ILogger<GameEventService> logger, GameEventMapper gameEventMapper, IUserService userService, IJwtTokenService jwtTokenService)
+        public GameEventService(AppDbContext context, ILogger<GameEventService> logger, GameEventMapper gameEventMapper, IUserService userService, IJwtTokenService jwtTokenService, GuidGenerator guidGenerator)
         {
             _context = context;
             _logger = logger;
             _gameEventMapper = gameEventMapper;
             _userService = userService;
             _jwtTokenService = jwtTokenService;
+            _guidGenerator = guidGenerator;
         }
 
         // CREATE EVENT
@@ -37,17 +40,8 @@ namespace BeGamer.Services
             {
                 var gameEvent = _gameEventMapper.ToEntity(createGameEventDTO);
 
-                gameEvent.Id = Guid.NewGuid(); // Assign a new GUID
-                // Check the originality of the generated GUID
-                while (true)
-                {
-                    if (!GameEventExistsById(gameEvent.Id)) break;
-                    gameEvent.Id = Guid.NewGuid();
-                }
-                // extract organizer from token temporary hardcoded
-                //gameEvent.OrganizerId = _jwtTokenService.ExtractUserIdFromToken();
-                gameEvent.Organizer = _context.Users.FirstOrDefault(u => u.Id == gameEvent.OrganizerId);
-
+                // Assign a unique GUID using the GuidGenerator utility
+                gameEvent.Id = _guidGenerator.GenerateUniqueGuid(GameEventExistsById);
 
                 await _context.GameEvents.AddAsync(gameEvent);
                 await _context.SaveChangesAsync();

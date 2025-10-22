@@ -1,8 +1,8 @@
 ﻿namespace BeGamer.DTOs.User
 {
     public record UserDTO(
-        Guid Id,
-        string Username,
+        string Id,
+        string UserName,
         string? Nickname
     )
     {

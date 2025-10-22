@@ -81,7 +81,7 @@ namespace BeGamer.Controllers
 
         // GET: api/Users/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDTO>> GetUser(Guid id)
+        public async Task<ActionResult<UserDTO>> GetUser(string id)
         {
             _logger.LogInformation("API request received to get user with ID: {UserId}", id);
 
@@ -99,7 +99,7 @@ namespace BeGamer.Controllers
 
         // PUT: api/Users/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(Guid id, UpdateUserDTO updateUserDTO)
+        public async Task<IActionResult> PutUser(string id, UpdateUserDTO updateUserDTO)
         {
             _logger.LogInformation("API request received to update user with ID: {UserId}", id);
 
@@ -143,7 +143,7 @@ namespace BeGamer.Controllers
 
         // DELETE: api/Users/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
             _logger.LogInformation("API request received to delete user with ID: {UserId}", id);
 

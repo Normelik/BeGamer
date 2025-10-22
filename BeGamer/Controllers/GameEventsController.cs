@@ -89,7 +89,7 @@ namespace BeGamer.Controllers
         {
             _logger.LogInformation("API request received to create a new GameEvent.");
 
-            // Input validation (basic, controller-level)
+            // Input validation 
             if (createGameEventDTO == null)
             {
                 _logger.LogWarning("CreateGameEventDTO is null. Cannot create GameEvent.");
