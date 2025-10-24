@@ -1,14 +1,11 @@
 ﻿using BeGamer.DTOs.GameEvent;
-using BeGamer.DTOs.User;
-using BeGamer.Models;
-using BeGamer.Services;
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BeGamer.Controllers
 {
-    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class GameEventsController : ControllerBase
@@ -98,7 +95,8 @@ namespace BeGamer.Controllers
 
             try
             {
-                var GameEvent = await _gameEventService.CreateGameEvent(createGameEventDTO);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var GameEvent = await _gameEventService.CreateGameEvent(userId, createGameEventDTO);
 
                 if (GameEvent == null)
                 {

@@ -1,5 +1,6 @@
 ﻿using BeGamer.DTOs;
 using BeGamer.DTOs.User;
+using BeGamer.Services;
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,25 +20,27 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginDTO loginDTO)
+    public async Task<IActionResult> Login(LoginDTO loginDTO)
     {
         if (loginDTO == null || string.IsNullOrEmpty(loginDTO.Username) || string.IsNullOrEmpty(loginDTO.Password))
         {
             return BadRequest("Invalid login data.");
         }
-        _authService.Login(loginDTO);
-
-        return Unauthorized();
+        
+        var token =  await _authService.Login(loginDTO);
+        return Ok(token);
+        ;
     }
 
     [HttpPost("register")]
-    public IActionResult Register([FromBody] CreateUserDTO registerUserDTO)
+    public async Task<IActionResult> Register(RegisterUserDTO registerUserDTO)
     {
         if (registerUserDTO == null || string.IsNullOrEmpty(registerUserDTO.Username) || string.IsNullOrEmpty(registerUserDTO.Password))
         {
             return BadRequest("Invalid registration data.");
         }
-        _authService.Register(registerUserDTO);
-        return Unauthorized();
+        await _authService.Register(registerUserDTO);
+        return Ok();
     }
+
 }

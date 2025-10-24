@@ -1,4 +1,5 @@
-﻿using BeGamer.DTOs.User;
+﻿using BeGamer.DTOs;
+using BeGamer.DTOs.User;
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BeGamer.Controllers
 {
-    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -22,7 +22,7 @@ namespace BeGamer.Controllers
 
         // POST: api/Users
         [HttpPost]
-        public async Task<ActionResult<UserDTO>> PostUser(CreateUserDTO createUserDTO)
+        public async Task<ActionResult<UserDTO>> PostUser(RegisterUserDTO createUserDTO)
         {
             _logger.LogInformation("API request received to create a new user.");
 

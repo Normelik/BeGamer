@@ -8,11 +8,12 @@ namespace BeGamer.Services.Interfaces
     {
         Task<IEnumerable<UserDTO>> GetAllUsersAsync();
         Task<UserDTO> GetUserById(string id);
-        Task<UserDTO> CreateUserAsync(CreateUserDTO createUserDTO);
+        Task<UserDTO> CreateUserAsync(RegisterUserDTO createUserDTO);
         Task<UserDTO> UpdateUser(string id, UpdateUserDTO updateUserDTO);
         Task<bool> DeleteUser(string id);
 
         CustomUser GetUserAsOrganizer(string id);
+        Task<CustomUser?> GetUserByUsernameAsync(string username);
 
         bool UserExistsById(string id);
     }

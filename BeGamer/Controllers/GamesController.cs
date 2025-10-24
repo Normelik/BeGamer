@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BeGamer.Controllers
 {
-    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class GamesController : ControllerBase
@@ -22,14 +21,14 @@ namespace BeGamer.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Game>>> GetGames()
         {
-            return await _context.Games.ToListAsync();
+            return await _context.Game.ToListAsync();
         }
 
         // GET: api/Games/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Game>> GetGame(Guid id)
         {
-            var game = await _context.Games.FindAsync(id);
+            var game = await _context.Game.FindAsync(id);
 
             if (game == null)
             {
@@ -73,7 +72,7 @@ namespace BeGamer.Controllers
         [HttpPost]
         public async Task<ActionResult<Game>> PostGame(Game game)
         {
-            _context.Games.Add(game);
+            _context.Game.Add(game);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGame", new { id = game.Id }, game);
@@ -83,13 +82,13 @@ namespace BeGamer.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGame(Guid id)
         {
-            var game = await _context.Games.FindAsync(id);
+            var game = await _context.Game.FindAsync(id);
             if (game == null)
             {
                 return NotFound();
             }
 
-            _context.Games.Remove(game);
+            _context.Game.Remove(game);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -97,7 +96,7 @@ namespace BeGamer.Controllers
 
         private bool GameExists(Guid id)
         {
-            return _context.Games.Any(e => e.Id == id);
+            return _context.Game.Any(e => e.Id == id);
         }
     }
 }

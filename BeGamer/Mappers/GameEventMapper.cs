@@ -35,7 +35,8 @@ namespace BeGamer.Mappers
             return new GameEvent
             {
                 Title = dto.Title,
-                Location = dto.Location,
+                LocationId = dto.LocationId,    
+                Location = null, // To be set in the service layer
                 DateEvent = dto.DateEvent,
                 Organizer = null, // To be set in the service layer
                 OrganizerId = "", // To be set in the service layer

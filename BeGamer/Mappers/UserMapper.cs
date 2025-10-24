@@ -1,4 +1,5 @@
-﻿using BeGamer.DTOs.User;
+﻿using BeGamer.DTOs;
+using BeGamer.DTOs.User;
 using BeGamer.Models;
 
 namespace BeGamer.Mappers
@@ -6,16 +7,15 @@ namespace BeGamer.Mappers
         public class UserMapper
     {
 
-        public CustomUser ToModel(CreateUserDTO createUserDTO)
+        public CustomUser ToModel(RegisterUserDTO registerUserDTO)
         {
             return new CustomUser
             {
-                UserName = createUserDTO.Username,
-                PasswordHash = createUserDTO.Password,
-                Nickname = createUserDTO.Nickname
+                UserName = registerUserDTO.Username,
+                PasswordHash = registerUserDTO.Password
             };
         }
-        public IEnumerable<CustomUser> ToModelList(IEnumerable<CreateUserDTO> userDtos)
+        public IEnumerable<CustomUser> ToModelList(IEnumerable<RegisterUserDTO> userDtos)
         {
             return userDtos.Select(dto => ToModel(dto)).ToList();
         }

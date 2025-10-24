@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeGamer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251022131322_InitialIdentitySetup")]
-    partial class InitialIdentitySetup
+    [Migration("20251024065354_InitialSetup")]
+    partial class InitialSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,7 @@ namespace BeGamer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Address");
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("BeGamer.Models.CustomUser", b =>
@@ -147,7 +147,7 @@ namespace BeGamer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Games");
+                    b.ToTable("Game");
                 });
 
             modelBuilder.Entity("BeGamer.Models.GameEvent", b =>
@@ -201,12 +201,12 @@ namespace BeGamer.Migrations
                     b.Property<Guid>("GameEventId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Id")
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("GameEventId", "Id");
+                    b.HasKey("GameEventId", "UserId");
 
-                    b.HasIndex("Id");
+                    b.HasIndex("UserId");
 
                     b.ToTable("GameEventParticipant");
                 });
@@ -349,7 +349,7 @@ namespace BeGamer.Migrations
                     b.HasOne("BeGamer.Models.Game", "Game")
                         .WithMany("Events")
                         .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BeGamer.Models.Address", "Location")
@@ -361,7 +361,7 @@ namespace BeGamer.Migrations
                     b.HasOne("BeGamer.Models.CustomUser", "Organizer")
                         .WithMany("OrganizedEvents")
                         .HasForeignKey("OrganizerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Game");
@@ -376,12 +376,12 @@ namespace BeGamer.Migrations
                     b.HasOne("BeGamer.Models.GameEvent", null)
                         .WithMany()
                         .HasForeignKey("GameEventId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BeGamer.Models.CustomUser", null)
                         .WithMany()
-                        .HasForeignKey("Id")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

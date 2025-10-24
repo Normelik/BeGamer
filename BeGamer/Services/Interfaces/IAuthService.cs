@@ -6,7 +6,7 @@ namespace BeGamer.Services.Interfaces
     public interface IAuthService
     {
 
-        string Login(LoginDTO loginDTO);
-        string Register(CreateUserDTO registerUserDTO);
+        Task<string> Login(LoginDTO loginDTO);
+        Task<string> Register(RegisterUserDTO registerUserDTO);
     }
 }

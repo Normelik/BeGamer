@@ -1,10 +1,11 @@
-﻿using BeGamer.Data;
+﻿
+
+using BeGamer.Data;
 using BeGamer.DTOs.GameEvent;
 using BeGamer.Mappers;
 using BeGamer.Models;
 using BeGamer.Services.Interfaces;
 using BeGamer.Utils;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -20,8 +21,14 @@ namespace BeGamer.Services
         private readonly IJwtTokenService _jwtTokenService;
         private readonly GuidGenerator _guidGenerator;
 
-        public GameEventService(AppDbContext context, ILogger<GameEventService> logger, GameEventMapper gameEventMapper, IUserService userService, IJwtTokenService jwtTokenService, GuidGenerator guidGenerator)
-        {
+        public GameEventService(
+                                AppDbContext context,
+                                ILogger<GameEventService> logger,
+                                GameEventMapper gameEventMapper,
+                                IUserService userService,
+                                IJwtTokenService jwtTokenService,
+                                GuidGenerator guidGenerator)
+                            {
             _context = context;
             _logger = logger;
             _gameEventMapper = gameEventMapper;
@@ -31,17 +38,19 @@ namespace BeGamer.Services
         }
 
         // CREATE EVENT
-        public async Task<GameEventDTO> CreateGameEvent(CreateGameEventDTO createGameEventDTO)
+        public async Task<GameEventDTO> CreateGameEvent(string id, CreateGameEventDTO createGameEventDTO)
         {
             _logger.LogInformation("Start creating new GameEvent.");
 
-            
             try
             {
                 var gameEvent = _gameEventMapper.ToEntity(createGameEventDTO);
 
                 // Assign a unique GUID using the GuidGenerator utility
                 gameEvent.Id = _guidGenerator.GenerateUniqueGuid(GameEventExistsById);
+                gameEvent.OrganizerId = id;
+                //gameEvent.OrganizerId = "47b41a8f-ac72-478f-a6cc-a80919aad117"; // Temporary hardcoded organizer ID, TODO: get from auth service
+                gameEvent.Location = await _context.Addresses.FindAsync(createGameEventDTO.LocationId);
 
                 await _context.GameEvents.AddAsync(gameEvent);
                 await _context.SaveChangesAsync();
@@ -67,7 +76,7 @@ namespace BeGamer.Services
                 var gameEvents = await _context.GameEvents.ToListAsync();
                 _logger.LogInformation("Fetched {Count} GameEvents from the database.", gameEvents.Count);
 
-                if (gameEvents.IsNullOrEmpty())
+                if (gameEvents == null || !gameEvents.Any())
                 {
                     return Enumerable.Empty<GameEventDTO>();
                 }

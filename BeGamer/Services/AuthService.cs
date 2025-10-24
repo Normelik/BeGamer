@@ -1,8 +1,10 @@
 ﻿using BeGamer.DTOs;
 using BeGamer.DTOs.User;
+using BeGamer.Models;
 using BeGamer.Services.Interfaces;
-using Microsoft.Identity.Client;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace BeGamer.Services
 {
@@ -10,37 +12,47 @@ namespace BeGamer.Services
     {
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IUserService _userService;
-        public AuthService(IJwtTokenService jwtTokenService, IUserService userService)
+        private readonly UserManager<CustomUser> _userManager;
+        public AuthService(IJwtTokenService jwtTokenService, IUserService userService, UserManager<CustomUser> userManager )
         {
             _jwtTokenService = jwtTokenService;
             _userService = userService;
+            _userManager = userManager;
         }
 
-        public string Login(LoginDTO loginDTO)
+        public async Task<string> Login(LoginDTO loginDTO)
         {
-           
-           
-            return null;
+            //var user = await _userManager.FindByNameAsync(loginDTO.Username);
+            var user = await _userService.GetUserByUsernameAsync(loginDTO.Username);
+
+            if (user == null)
+            {
+                // user not found
+                throw new Exception("User not found");
+            }
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, loginDTO.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Id )
+
+            };
+
+            var token = _jwtTokenService.GenerateToken(claims);
+
+            return token;
         }
 
-        public string Register(CreateUserDTO registerUserDTO)
+        public async Task<string> Register(RegisterUserDTO registerUserDTO)
         {
             if (!string.IsNullOrEmpty(registerUserDTO.Username) && !string.IsNullOrEmpty(registerUserDTO.Password))
             {
-                _userService.CreateUserAsync(registerUserDTO).Wait();
+                await _userService.CreateUserAsync(registerUserDTO);
+                return "User registered successfully.";
 
             }
-            // Po úspěšné registraci můžeš rovnou přihlásit uživatele
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Name, registerUserDTO.Username),
-                new Claim(ClaimTypes.Role, "User")
-            };
-            var token = _jwtTokenService.GenerateToken(claims);
-           
-
-                return token;
             
+            return null;
+
         }
     }
 }

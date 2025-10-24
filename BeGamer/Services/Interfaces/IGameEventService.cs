@@ -6,7 +6,7 @@ namespace BeGamer.Services.Interfaces
     {
         Task<IEnumerable<GameEventDTO>> GetAllGameEventsAsync();
         Task<GameEventDTO> GetGameEventById(Guid id);
-        Task<GameEventDTO> CreateGameEvent(CreateGameEventDTO createGameEventDTO);
+        Task<GameEventDTO> CreateGameEvent(string id, CreateGameEventDTO createGameEventDTO);
         Task<GameEventDTO> UpdateGameEvent(Guid id, GameEventDTO gameEventDto);
         Task<bool> DeleteGameEvent(Guid id);
     }

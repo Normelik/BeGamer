@@ -22,18 +22,18 @@ namespace BeGamer.Services
         }
 
         //CREATE USER
-        public async Task<UserDTO> CreateUserAsync(CreateUserDTO createUserDTO)
+        public async Task<UserDTO> CreateUserAsync(RegisterUserDTO registerUserDTO)
         {
-            _logger.LogInformation("Creating a new user with username: {Username}", createUserDTO.Username);
+            _logger.LogInformation("Creating a new user with username: {Username}", registerUserDTO.Username);
             try
             {
-                var user = _userMapper.ToModel(createUserDTO);
+                var user = _userMapper.ToModel(registerUserDTO);
                 user.Id = Guid.NewGuid().ToString(); // Assign a new GUID
 
                 // Check the originality of the generated GUID
                 while (true)
                 {
-                    
+
                     if (!UserExistsById(user.Id)) break;
                     user.Id = Guid.NewGuid().ToString();
                 }
@@ -95,6 +95,20 @@ namespace BeGamer.Services
                 throw;
             }
         }
+        // Generická metoda s mapovací funkcí
+        //public async Task<T> GetByIdAsync<T>(string id, Func<CustomUser, T> map)
+        //{
+        //    // Načteme entitu spolu s organizátorem
+        //    var user = await _context.GameEvents
+        //                                  .Include(e => e.Organizer)
+        //                                  .FirstOrDefaultAsync(e => e.Id.Equals(id));
+
+        //    if (user == null)
+        //        throw new KeyNotFoundException($"GameEvent s Id {id} nebyl nalezen.");
+
+        //    // Použijeme mapovací funkci pro převod na DTO, entitu nebo jiný typ
+        //    return map(user);
+        //}
 
         // UPDATE USER
         public async Task<UserDTO> UpdateUser(string id, UpdateUserDTO updateUserDTO)
@@ -199,6 +213,26 @@ namespace BeGamer.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching user as organizer with ID: {UserId}", id);
+                throw;
+            }
+        }
+        public async Task<CustomUser?> GetUserByUsernameAsync(string username)
+        {
+            _logger.LogInformation("Fetching user with username: {Username}", username);
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+                if (user == null)
+                {
+                    _logger.LogWarning("User with username: {Username} not found.", username);
+                    return null;
+                }
+                _logger.LogInformation("User with username: {Username} successfully fetched.", username);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching user with username: {Username}", username);
                 throw;
             }
         }
