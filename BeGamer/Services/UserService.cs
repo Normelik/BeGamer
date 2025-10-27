@@ -4,6 +4,7 @@ using BeGamer.DTOs.User;
 using BeGamer.Mappers;
 using BeGamer.Models;
 using BeGamer.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeGamer.Services
@@ -13,12 +14,14 @@ namespace BeGamer.Services
         private readonly AppDbContext _context;
         private readonly UserMapper _userMapper;
         private readonly ILogger<UserService> _logger;
+        private readonly PasswordHasher<CustomUser> _passwordHasher;
 
-        public UserService(AppDbContext context, UserMapper userMapper, ILogger<UserService> logger)
+        public UserService(AppDbContext context, UserMapper userMapper, ILogger<UserService> logger, PasswordHasher<CustomUser> passwordHasher)
         {
             _context = context;
             _userMapper = userMapper;
             _logger = logger;
+            _passwordHasher = passwordHasher;
         }
 
         //CREATE USER
@@ -29,6 +32,7 @@ namespace BeGamer.Services
             {
                 var user = _userMapper.ToModel(registerUserDTO);
                 user.Id = Guid.NewGuid().ToString(); // Assign a new GUID
+                user.PasswordHash = _passwordHasher.HashPassword(user, registerUserDTO.Password);
 
                 // Check the originality of the generated GUID
                 while (true)

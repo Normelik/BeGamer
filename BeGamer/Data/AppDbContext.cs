@@ -1,6 +1,7 @@
 ﻿namespace BeGamer.Data;
 
 using BeGamer.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -53,6 +54,9 @@ public class AppDbContext : IdentityDbContext<CustomUser>
 
     public static void Seed(AppDbContext context)
     {
+        PasswordHasher<CustomUser> passwordHasher = new PasswordHasher<CustomUser>();
+        var hashedPassword1 = passwordHasher.HashPassword(null, "password123");
+        var hashedPassword2 = passwordHasher.HashPassword(null, "securepass");
         // Ověření, zda už jsou data přítomná
         if (!context.Game.Any())
         {
@@ -90,14 +94,14 @@ public class AppDbContext : IdentityDbContext<CustomUser>
                 {
                     Id = "47b41a8f-ac72-478f-a6cc-a80919aad117",
                     UserName = "john_doe",
-                    PasswordHash = "password123",
+                    PasswordHash = hashedPassword1,
                     Nickname = "Johnny"
                 },
                 new CustomUser
                 {
                     Id = "1a482a4e-3395-4269-8766-edeab8eb65f7",
                     UserName = "jane_smith",
-                    PasswordHash = "securepass",
+                    PasswordHash = hashedPassword2,
                     Nickname = "Janie"
                 }
             );
