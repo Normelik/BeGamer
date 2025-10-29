@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BeGamer.DTOs.Auth;
+using System.ComponentModel.DataAnnotations;
 
 namespace BeGamer.DTOs.User
 {

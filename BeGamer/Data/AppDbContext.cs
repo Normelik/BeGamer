@@ -20,6 +20,12 @@ public class AppDbContext : IdentityDbContext<CustomUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Nastavení unikátního indexu na Username
+        modelBuilder.Entity<CustomUser>()
+            .HasIndex(u => u.UserName)
+            .IsUnique();
+
         // 1:N Organizer - GameEvents
         modelBuilder.Entity<GameEvent>()
             .HasOne(e => e.Organizer)

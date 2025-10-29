@@ -1,5 +1,5 @@
 ﻿using BeGamer.Data;
-using BeGamer.DTOs;
+using BeGamer.DTOs.Auth;
 using BeGamer.DTOs.User;
 using BeGamer.Mappers;
 using BeGamer.Models;
@@ -14,9 +14,9 @@ namespace BeGamer.Services
         private readonly AppDbContext _context;
         private readonly UserMapper _userMapper;
         private readonly ILogger<UserService> _logger;
-        private readonly PasswordHasher<CustomUser> _passwordHasher;
+        private readonly IPasswordHasher<CustomUser> _passwordHasher;
 
-        public UserService(AppDbContext context, UserMapper userMapper, ILogger<UserService> logger, PasswordHasher<CustomUser> passwordHasher)
+        public UserService(AppDbContext context, UserMapper userMapper, ILogger<UserService> logger, IPasswordHasher<CustomUser> passwordHasher)
         {
             _context = context;
             _userMapper = userMapper;

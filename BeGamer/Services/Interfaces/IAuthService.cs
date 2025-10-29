@@ -1,12 +1,12 @@
 ﻿using BeGamer.DTOs;
-using BeGamer.DTOs.User;
+using BeGamer.DTOs.Auth;
 
 namespace BeGamer.Services.Interfaces
 {
     public interface IAuthService
     {
 
-        Task<string> Login(LoginDTO loginDTO);
-        Task<string> Register(RegisterUserDTO registerUserDTO);
+        Task<ResponseTokenDTO?> LoginAsync(LoginDTO loginDTO);
+        Task<string> RegisterAsync(RegisterUserDTO registerUserDTO);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BeGamer.DTOs
+namespace BeGamer.DTOs.Auth
 {
     public record RegisterUserDTO(
         [Required(ErrorMessage ="Username is required")]

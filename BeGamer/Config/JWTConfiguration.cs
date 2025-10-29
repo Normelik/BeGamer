@@ -28,7 +28,17 @@ namespace BeGamer.Config
                     ValidAudience = jwtSettings["Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine("JWT Authentication Failed: " + context.Exception.Message);
+                        return Task.CompletedTask;
+                    }
+                };
             });
+
 
             return services;
         }

@@ -1,7 +1,5 @@
-﻿using BeGamer.Data;
-using BeGamer.Models;
+﻿using BeGamer.Models;
 using BeGamer.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BeGamer.Controllers
@@ -11,18 +9,17 @@ namespace BeGamer.Controllers
     public class AddressesController : ControllerBase
     {
         private readonly ILogger<AddressesController> _logger;
-        private readonly AppDbContext _context;
         private readonly AddressService _addressService;
 
-        public AddressesController(ILogger<AddressesController> logger, AppDbContext context, AddressService addressService)
+        public AddressesController(ILogger<AddressesController> logger, AddressService addressService)
         {
             _logger = logger;
-            _context = context;
             _addressService = addressService;
         }
+
         // GET: api/Addresses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Address>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<Address>>> GetAllAdresses()
         {
             _logger.LogInformation("API request received to get all addresses.");
 

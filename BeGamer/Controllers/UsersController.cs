@@ -1,4 +1,4 @@
-﻿using BeGamer.DTOs;
+﻿using BeGamer.DTOs.Auth;
 using BeGamer.DTOs.User;
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -21,18 +21,17 @@ namespace BeGamer.Controllers
 
         // POST: api/Users
         [HttpPost]
-        public async Task<ActionResult<UserDTO>> PostUser(RegisterUserDTO createUserDTO)
+        public async Task<ActionResult<UserDTO>> PostUser(RegisterUserDTO registerUserDTO)
         {
             _logger.LogInformation("API request received to create a new user.");
 
-            // Input validation (basic, controller-level)
-            if (createUserDTO == null)
+            if (registerUserDTO == null)
             {
-                _logger.LogWarning("CreateUserDTO is null. Cannot create user.");
+                _logger.LogWarning("RegisterUserDTO is null. Cannot create user.");
                 return BadRequest("Wrong user data were provided.");
             }
 
-            if (string.IsNullOrWhiteSpace(createUserDTO.Username))
+            if (string.IsNullOrWhiteSpace(registerUserDTO.Username))
             {
                 _logger.LogWarning("CreateUserDTO has missing required fields: Username");
                 return BadRequest("Username is required.");
@@ -40,7 +39,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var createdUser = await _userService.CreateUserAsync(createUserDTO);
+                var createdUser = await _userService.CreateUserAsync(registerUserDTO);
 
                 if (createdUser == null)
                 {
@@ -122,7 +121,7 @@ namespace BeGamer.Controllers
                 await _userService.UpdateUser(id, updateUserDTO);
 
                 _logger.LogInformation("User with ID {UserId} updated successfully.", id);
-                return NoContent(); // 204 No Content = úspěšná aktualizace
+                return NoContent(); 
             }
             catch (DbUpdateConcurrencyException ex)
             {

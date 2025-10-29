@@ -1,4 +1,4 @@
-﻿using BeGamer.DTOs;
+﻿using BeGamer.DTOs.Auth;
 using BeGamer.DTOs.User;
 using BeGamer.Models;
 
