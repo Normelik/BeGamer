@@ -1,5 +1,4 @@
-﻿using BeGamer.DTOs;
-using BeGamer.DTOs.Auth;
+﻿using BeGamer.DTOs.Auth;
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

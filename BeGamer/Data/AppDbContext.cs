@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 
-public class AppDbContext : IdentityDbContext<CustomUser>
+public class AppDbContext : IdentityDbContext<CustomUser, IdentityRole<Guid>,Guid>
 {
     public DbSet<Game> Game { get; set; }
     public DbSet<GameEvent> GameEvents { get; set; }
@@ -98,14 +98,14 @@ public class AppDbContext : IdentityDbContext<CustomUser>
             context.Users.AddRange(
                 new CustomUser
                 {
-                    Id = "47b41a8f-ac72-478f-a6cc-a80919aad117",
+                    Id = Guid.Parse("47b41a8f-ac72-478f-a6cc-a80919aad117"),
                     UserName = "john_doe",
                     PasswordHash = hashedPassword1,
                     Nickname = "Johnny"
                 },
                 new CustomUser
                 {
-                    Id = "1a482a4e-3395-4269-8766-edeab8eb65f7",
+                    Id = Guid.Parse("1a482a4e-3395-4269-8766-edeab8eb65f7"),
                     UserName = "jane_smith",
                     PasswordHash = hashedPassword2,
                     Nickname = "Janie"

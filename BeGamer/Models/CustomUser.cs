@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿
+using Microsoft.AspNetCore.Identity;
 
 namespace BeGamer.Models
 {
-    public class CustomUser : IdentityUser
+    public class CustomUser : IdentityUser<Guid>
     {
         public string? Nickname { get; set; }
 

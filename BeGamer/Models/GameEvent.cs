@@ -7,8 +7,8 @@
         public required Guid LocationId { get; set; }
         public Address? Location { get; set; }
         public DateTime DateEvent { get; set; }
-        public required string OrganizerId { get; set; }
-        public CustomUser Organizer { get; set; }
+        public required Guid OrganizerId { get; set; }
+        public CustomUser? Organizer { get; set; }
         public List<CustomUser> Participants { get; set; } = [];
         public int MaxPlayers { get; set; }
         public int MinPlayers { get; set; } = 0;

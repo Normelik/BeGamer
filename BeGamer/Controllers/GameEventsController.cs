@@ -1,6 +1,5 @@
 ﻿using BeGamer.DTOs.GameEvent;
 using BeGamer.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -96,7 +95,7 @@ namespace BeGamer.Controllers
             try
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var GameEvent = await _gameEventService.CreateGameEvent(userId, createGameEventDTO);
+                var GameEvent = await _gameEventService.CreateGameEvent(Guid.Parse(userId!), createGameEventDTO);
 
                 if (GameEvent == null)
                 {

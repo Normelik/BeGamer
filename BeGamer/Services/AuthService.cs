@@ -45,7 +45,7 @@ namespace BeGamer.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, loginDTO.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.Id ),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             };
 
             var token = _jwtTokenService.GenerateToken(claims);

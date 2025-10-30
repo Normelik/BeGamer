@@ -23,7 +23,7 @@ builder.Services.AddControllers((options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<CustomUser, IdentityRole>()
+builder.Services.AddIdentity<CustomUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 

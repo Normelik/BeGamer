@@ -1,14 +1,9 @@
-﻿
-
-using BeGamer.Data;
+﻿using BeGamer.Data;
 using BeGamer.DTOs.GameEvent;
 using BeGamer.Mappers;
-using BeGamer.Models;
 using BeGamer.Services.Interfaces;
 using BeGamer.Utils;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 
 namespace BeGamer.Services
 {
@@ -17,28 +12,22 @@ namespace BeGamer.Services
         private readonly AppDbContext _context;
         private readonly ILogger<GameEventService> _logger;
         private readonly GameEventMapper _gameEventMapper;
-        private readonly IUserService _userService;
-        private readonly IJwtTokenService _jwtTokenService;
         private readonly GuidGenerator _guidGenerator;
 
         public GameEventService(
                                 AppDbContext context,
                                 ILogger<GameEventService> logger,
                                 GameEventMapper gameEventMapper,
-                                IUserService userService,
-                                IJwtTokenService jwtTokenService,
                                 GuidGenerator guidGenerator)
-                            {
+        {
             _context = context;
             _logger = logger;
             _gameEventMapper = gameEventMapper;
-            _userService = userService;
-            _jwtTokenService = jwtTokenService;
             _guidGenerator = guidGenerator;
         }
 
         // CREATE EVENT
-        public async Task<GameEventDTO> CreateGameEvent(string id, CreateGameEventDTO createGameEventDTO)
+        public async Task<GameEventDTO> CreateGameEvent(Guid id, CreateGameEventDTO createGameEventDTO)
         {
             _logger.LogInformation("Start creating new GameEvent.");
 
@@ -47,9 +36,9 @@ namespace BeGamer.Services
                 var gameEvent = _gameEventMapper.ToEntity(createGameEventDTO);
 
                 // Assign a unique GUID using the GuidGenerator utility
-                gameEvent.Id = _guidGenerator.GenerateUniqueGuid(GameEventExistsById);
+                gameEvent.Id = _guidGenerator.GenerateUniqueGuid(GameEventExistsById!);
                 gameEvent.OrganizerId = id;
-                //gameEvent.OrganizerId = "47b41a8f-ac72-478f-a6cc-a80919aad117"; // Temporary hardcoded organizer ID, TODO: get from auth service
+
                 gameEvent.Location = await _context.Addresses.FindAsync(createGameEventDTO.LocationId);
 
                 await _context.GameEvents.AddAsync(gameEvent);
@@ -78,7 +67,7 @@ namespace BeGamer.Services
 
                 if (gameEvents == null || !gameEvents.Any())
                 {
-                    return Enumerable.Empty<GameEventDTO>();
+                    return [];
                 }
 
                 return _gameEventMapper.ToDtoList(gameEvents);
@@ -91,7 +80,7 @@ namespace BeGamer.Services
         }
 
         // GET EVENT BY ID
-        public async Task<GameEventDTO> GetGameEventById(Guid id)
+        public async Task<GameEventDTO?> GetGameEventById(Guid id)
         {
             _logger.LogInformation("Fetching GameEvent with ID: {GameEventId}", id);
 
@@ -118,10 +107,10 @@ namespace BeGamer.Services
         }
 
         // UPDATE EVENT
-        public async Task<GameEventDTO> UpdateGameEvent(Guid id, GameEventDTO gameEventDto)
+        public async Task<GameEventDTO?> UpdateGameEvent(Guid id, GameEventDTO gameEventDto)
         {
             _logger.LogInformation("Attempting to update GameEvent with ID: {GameEventId}", id);
-            
+
             try
             {
                 GameEventExistsById(id); // Check if GameEvent exists
@@ -155,7 +144,7 @@ namespace BeGamer.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating GameEvent with ID: {GameEventId}", id);
-                throw; 
+                throw;
             }
         }
 

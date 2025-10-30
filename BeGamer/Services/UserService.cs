@@ -31,7 +31,7 @@ namespace BeGamer.Services
             try
             {
                 var user = _userMapper.ToModel(registerUserDTO);
-                user.Id = Guid.NewGuid().ToString(); // Assign a new GUID
+                user.Id = Guid.NewGuid(); // Assign a new GUID
                 user.PasswordHash = _passwordHasher.HashPassword(user, registerUserDTO.Password);
 
                 // Check the originality of the generated GUID
@@ -39,7 +39,7 @@ namespace BeGamer.Services
                 {
 
                     if (!UserExistsById(user.Id)) break;
-                    user.Id = Guid.NewGuid().ToString();
+                    user.Id = Guid.NewGuid();
                 }
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
@@ -74,7 +74,7 @@ namespace BeGamer.Services
         }
 
         // GET USER BY ID
-        public async Task<UserDTO> GetUserById(string id)
+        public async Task<UserDTO> GetUserById(Guid id)
         {
             _logger.LogInformation("Fetching user with ID: {UserId}", id);
 
@@ -115,7 +115,7 @@ namespace BeGamer.Services
         //}
 
         // UPDATE USER
-        public async Task<UserDTO> UpdateUser(string id, UpdateUserDTO updateUserDTO)
+        public async Task<UserDTO> UpdateUser(Guid id, UpdateUserDTO updateUserDTO)
         {
             _logger.LogInformation("Attempting to update user with ID: {UserId}", id);
 
@@ -149,7 +149,7 @@ namespace BeGamer.Services
         }
 
         // DELETE USER
-        public async Task<bool> DeleteUser(string id)
+        public async Task<bool> DeleteUser(Guid id)
         {
             try
             {
@@ -191,12 +191,12 @@ namespace BeGamer.Services
             }
         }
 
-        public bool UserExistsById(string id)
+        public bool UserExistsById(Guid id)
         {
             return _context.Users.Any(u => u.Id == id);
         }
 
-        public CustomUser GetUserAsOrganizer(string id)
+        public CustomUser GetUserAsOrganizer(Guid id)
         {
             try
             {
