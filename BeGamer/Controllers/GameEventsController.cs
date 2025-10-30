@@ -1,6 +1,8 @@
 ﻿using BeGamer.DTOs.GameEvent;
+using BeGamer.Models;
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BeGamer.Controllers
@@ -140,5 +142,45 @@ namespace BeGamer.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
-    }
+
+        // GET: api/GameEvents/nearby?lat=50.0&lon=14.0&distance=1000
+        [HttpGet("nearby")]
+        public async Task<ActionResult<List<GameEvent>>> GetNearby(
+            [FromQuery] double lat,
+            [FromQuery] double lon,
+            [FromQuery] double distance)
+        {
+            _logger.LogInformation(
+                "API request received to get nearby GameEvents. Latitude: {Latitude}, Longitude: {Longitude}, Distance: {Distance}m",
+                lat, lon, distance);
+
+            try
+            {
+                var nearbyEvents = await _gameEventService.GetNearbyGameEvents(lat, lon, distance);
+
+                if (nearbyEvents == null || !nearbyEvents.Any())
+                {
+                    _logger.LogWarning(
+                        "No GameEvents found near location ({Latitude}, {Longitude}) within {Distance} meters.",
+                        lat, lon, distance);
+
+                    return NotFound("No nearby GameEvents found.");
+                }
+
+                _logger.LogInformation(
+                    "{Count} GameEvents found near location ({Latitude}, {Longitude}) within {Distance} meters.",
+                    nearbyEvents.Count, lat, lon, distance);
+
+                return Ok(nearbyEvents);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "An error occurred while attempting to retrieve nearby GameEvents at ({Latitude}, {Longitude}) within {Distance} meters.",
+                    lat, lon, distance);
+
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
 }

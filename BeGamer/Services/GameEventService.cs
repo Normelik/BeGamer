@@ -1,6 +1,7 @@
 ﻿using BeGamer.Data;
 using BeGamer.DTOs.GameEvent;
 using BeGamer.Mappers;
+using BeGamer.Models;
 using BeGamer.Services.Interfaces;
 using BeGamer.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -194,5 +195,33 @@ namespace BeGamer.Services
         {
             return _context.GameEvents.Any(e => e.Id == id);
         }
+        // GET ALL EVENTS BY DISTANCE
+        public async Task<List<GameEvent>> GetNearbyGameEvents(
+                                            double userLatitude,
+                                            double userLongitude,
+                                            double distanceInMeters)
+        {
+            double R = 6371000; // Poloměr Země v metrech
+            double latRad = userLatitude * Math.PI / 180;
+            double lonRad = userLongitude * Math.PI / 180;
+
+            var nearbyEvents = await _context.GameEvents
+                .Include(e => e.Location)
+                .Where(e => e.Location != null &&
+                    (
+                        2 * R * Math.Asin(
+                            Math.Sqrt(
+                                Math.Pow(Math.Sin(((e.Location.Latitude * Math.PI / 180) - latRad) / 2), 2) +
+                                (Math.Cos(latRad) * Math.Cos(e.Location.Latitude * Math.PI / 180) *
+                                Math.Pow(Math.Sin(((e.Location.Longitude * Math.PI / 180) - lonRad) / 2), 2))
+                            )
+                        )
+                    ) <= distanceInMeters
+                )
+                .ToListAsync();
+
+            return nearbyEvents;
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BeGamer.DTOs.GameEvent;
+using BeGamer.Models;
 
 namespace BeGamer.Services.Interfaces
 {
@@ -9,5 +10,9 @@ namespace BeGamer.Services.Interfaces
         Task<GameEventDTO> CreateGameEvent(Guid id, CreateGameEventDTO createGameEventDTO);
         Task<GameEventDTO> UpdateGameEvent(Guid id, GameEventDTO gameEventDto);
         Task<bool> DeleteGameEvent(Guid id);
+
+        Task<List<GameEvent>> GetNearbyGameEvents(double userLatitude,
+                                            double userLongitude,
+                                            double distanceInMeters);
     }
 }
