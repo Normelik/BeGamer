@@ -1,12 +1,12 @@
 ﻿using BeGamer.Data;
 using BeGamer.Models;
+using BeGamer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace BeGamer.Services
 {
-    
-    public class AddressService
+
+    public class AddressService : IAddressService
     {
         private readonly ILogger<AddressService> _logger;
         private readonly AppDbContext _context;
@@ -17,24 +17,6 @@ namespace BeGamer.Services
             _context = context;
         }
 
-        //GET ALL USERS
-        //public  Task<List<Address>> GetAllAddressesAsync()
-        //{
-        //    _logger.LogInformation("Fetching all addresses from the database.");
-
-        //    try
-        //    {
-        //        var addresses =  _context.Addresses.ToList();
-        //        _logger.LogInformation("Fetched {Count} adresses from the database.", addresses.Count);
-
-        //        return Task.FromResult(addresses);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error occurred while fetching adresses.");
-        //        throw;
-        //    }
-        //}
         // GET ALL Addresses
         public async Task<IEnumerable<Address>> GetAllAddressesAsync()
         {

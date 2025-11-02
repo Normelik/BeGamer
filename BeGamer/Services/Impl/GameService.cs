@@ -26,33 +26,8 @@ namespace BeGamer.Services
             _guidGenerator = guidGenerator;
         }
 
-        // CREATE GAME
-        public async Task<GameDTO> CreateGameAsync(CreateGameDTO createGameDTO)
-        {
-            _logger.LogInformation("Start creating new Game.");
-
-            try
-            {
-                var game = _gameMapper.ToEntity(createGameDTO);
-
-                // Assign a unique GUID using the GuidGenerator utility
-                game.Id = _guidGenerator.GenerateUniqueGuid(GameExistsById);
-
-                await _context.Game.AddAsync(game);
-                await _context.SaveChangesAsync();
-                _logger.LogInformation("Game with ID: {GameId} successfully created.", game.Id);
-
-                return _gameMapper.ToDTO(game);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while creating a new Game.");
-                throw;
-            }
-        }
-
         // GET ALL GAMES
-        public async Task<IEnumerable<GameDTO>> GetAllGamesAsync()
+        public async Task<IEnumerable<GameDTO>> GetAllAsync()
         {
 
             _logger.LogInformation("Fetching all Games from the database.");
@@ -77,13 +52,13 @@ namespace BeGamer.Services
         }
 
         // GET GAME BY ID
-        public async Task<GameDTO> GetGameById(Guid id)
+        public async Task<GameDTO?> GetByIdAsync(Guid id)
         {
             _logger.LogInformation("Fetching Game with ID: {GameId}", id);
 
             try
             {
-                GameExistsById(id); // Check if Games exists
+                ExistsById(id); // Check if Games exists
 
                 var game = await _context.Game.FirstOrDefaultAsync(u => u.Id == id);
 
@@ -103,8 +78,33 @@ namespace BeGamer.Services
             }
         }
 
+        // CREATE GAME
+        public async Task<GameDTO> CreateAsync(CreateGameDTO createDto)
+        {
+            _logger.LogInformation("Start creating new Game.");
+
+            try
+            {
+                var game = _gameMapper.ToEntity(createDto);
+
+                // Assign a unique GUID using the GuidGenerator utility
+                game.Id = _guidGenerator.GenerateUniqueGuid(ExistsById);
+
+                await _context.Game.AddAsync(game);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Game with ID: {GameId} successfully created.", game.Id);
+
+                return _gameMapper.ToDTO(game);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating a new Game.");
+                throw;
+            }
+        }
+
         // UPDATE GAME
-        public async Task<GameDTO> UpdateGame(Guid id, UpdateGameDTO gameDto)
+        public async Task<GameDTO> UpdateAsync(Guid id, UpdateGameDTO updateDto)
         {
             _logger.LogInformation("Attempting to update Game with ID: {GameId}", id);
 
@@ -121,7 +121,7 @@ namespace BeGamer.Services
                 _logger.LogInformation("Game with ID: {GameId} found. Updating fields...", id);
 
                 // Buď ručně:
-                _gameMapper.ToExistingEntity(gameDto, game);
+                _gameMapper.ToExistingEntity(updateDto, game);
 
                 await _context.SaveChangesAsync();
 
@@ -137,13 +137,13 @@ namespace BeGamer.Services
         }
 
         // DELETE GAME
-        public async Task<bool> DeleteGame(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete Game with ID: {GameId}", id);
 
             try
             {
-                GameExistsById(id); // Check if Game exists
+                ExistsById(id); // Check if Game exists
 
                 var game = await _context.Game.FindAsync(id);
 
@@ -179,7 +179,8 @@ namespace BeGamer.Services
                 return false;
             }
         }
-        public bool GameExistsById(Guid id)
+
+        public bool ExistsById(Guid id)
         {
             return _context.Game.Any(e => e.Id == id);
         }

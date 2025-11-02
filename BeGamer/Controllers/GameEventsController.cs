@@ -62,7 +62,7 @@ namespace BeGamer.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGameEvent(GameEventDTO gameEventDTO)
         {
-            if(gameEventDTO == null)
+            if (gameEventDTO == null)
             {
                 _logger.LogWarning("GameEventDTO is null. Cannot update GameEvent.");
                 return BadRequest("Wrong GameEvent data were provided.");
@@ -183,4 +183,5 @@ namespace BeGamer.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
+    }
 }

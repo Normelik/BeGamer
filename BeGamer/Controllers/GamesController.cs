@@ -35,7 +35,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var createdGame = await _GameService.CreateGameAsync(createGameDTO);
+                var createdGame = await _GameService.CreateAsync(createGameDTO);
 
                 if (createdGame == null)
                 {
@@ -61,7 +61,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var Games = await _GameService.GetAllGamesAsync();
+                var Games = await _GameService.GetAllAsync();
 
                 _logger.LogInformation("Successfully returned {Count} Games.", Games.Count());
                 return Ok(Games);
@@ -79,7 +79,7 @@ namespace BeGamer.Controllers
         {
             _logger.LogInformation("API request received to get Game with ID: {GameId}", id);
 
-            var currentGame = await _GameService.GetGameById(id);
+            var currentGame = await _GameService.GetByIdAsync(id);
 
             if (currentGame == null)
             {
@@ -104,7 +104,7 @@ namespace BeGamer.Controllers
             }
 
             // Check if Game exists
-            if (!_GameService.GameExistsById(id))
+            if (!_GameService.ExistsById(id))
             {
                 _logger.LogWarning("Game with ID {GameId} not found. Update aborted.", id);
                 return NotFound(new { message = $"Game with ID {id} was not found for update." });
@@ -114,7 +114,7 @@ namespace BeGamer.Controllers
             {
                 _logger.LogInformation("Updating Game with ID {GameId}...", id);
 
-                await _GameService.UpdateGame(id, updateGameDTO);
+                await _GameService.UpdateAsync(id, updateGameDTO);
 
                 _logger.LogInformation("Game with ID {GameId} updated successfully.", id);
                 return NoContent();
@@ -143,7 +143,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var success = await _GameService.DeleteGame(id);
+                var success = await _GameService.DeleteAsync(id);
 
                 if (success)
                 {

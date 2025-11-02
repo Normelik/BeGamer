@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,22 +28,12 @@ builder.Services.AddIdentity<CustomUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddAllServices(Assembly.GetExecutingAssembly());
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<GuidGenerator>();
-builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IGameEventService, GameEventService>();
-builder.Services.AddScoped<IGameService, GameService>();
 
-builder.Services.AddScoped<UserMapper>();
-builder.Services.AddScoped<GameMapper>();
-builder.Services.AddScoped<GameEventMapper>();
-builder.Services.AddScoped<AddressService>();
-builder.Services.AddScoped<UserManager<CustomUser>>();
-builder.Services.AddScoped<PasswordHasher<CustomUser>>();
-
+builder.Services.AddAllServices(Assembly.GetExecutingAssembly());
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // CORS
 builder.Services.AddCors(options =>
