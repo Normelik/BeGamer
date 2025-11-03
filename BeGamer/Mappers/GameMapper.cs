@@ -18,7 +18,7 @@ namespace BeGamer.Mappers
                 game.Type
             );
         }
-        public IEnumerable<GameDTO> ToDtoList(IEnumerable<Game> games)
+        public IEnumerable<GameDTO> ToDtoList(List<Game> games)
         {
             if (games == null) return Enumerable.Empty<GameDTO>();
 

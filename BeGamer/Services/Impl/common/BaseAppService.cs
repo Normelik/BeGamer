@@ -1,25 +1,102 @@
-﻿using BeGamer.Services.Interfaces.common;
+﻿using BeGamer.Data;
+using BeGamer.Mappers;
+using BeGamer.Services.Interfaces.common;
+using BeGamer.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeGamer.Services.Impl.common
 {
-    public abstract class BaseAppService<TDto, TCreateDto, TUpdateDto> : IBaseAppService<TDto, TCreateDto, TUpdateDto>
-    {
-        protected readonly DbContext _context;
-        protected readonly ILogger<BaseAppService<TDto, TCreateDto, TUpdateDto>> _logger;
 
-        public BaseAppService(DbContext context, ILogger<BaseAppService<TDto, TCreateDto, TUpdateDto>> logger)
+    public abstract class BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto> : IBaseAppService<TEntity, TDto, TCreateDto, TUpdateDto> where TEntity : class
+    {
+        protected readonly AppDbContext _context;
+        protected readonly DbSet<TEntity> _dbSet;
+        protected readonly GuidGenerator _guidGenerator;
+        protected readonly ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto>> _logger;
+        protected readonly GameMapper _mapper;
+
+        public BaseAppService(AppDbContext context, ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto>> logger, GuidGenerator guidGenerator, GameMapper gameMapper)
         {
             _context = context;
+            _dbSet = _context.Set<TEntity>();
+            _guidGenerator = guidGenerator;
             _logger = logger;
+            _mapper = gameMapper;
         }
 
 
         public abstract Task<TDto> CreateAsync(TCreateDto createDto);
-        public abstract Task<bool> DeleteAsync(Guid id);
-        public abstract bool ExistsById(Guid id);
-        public abstract Task<IEnumerable<TDto>> GetAllAsync();
-        public abstract Task<TDto?> GetByIdAsync(Guid id);
+
         public abstract Task<TDto> UpdateAsync(Guid id, TUpdateDto updateDto);
+
+        public virtual async Task<bool> DeleteAsync(Guid id)
+        {
+            _logger.LogInformation("Attempting to delete {EntityName} entity with ID: {EntityId}", typeof(TEntity).Name, id);
+            try
+            {
+                var entity = await _context.Set<TEntity>().FindAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("{EntityName} entity with ID: {EntityId} not found. Deletion aborted.", typeof(TEntity).Name, id);
+                    return false;
+                }
+                _context.Set<TEntity>().Remove(entity);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("{EntityName} entity with ID: {EntityId} deleted successfully.", typeof(TEntity).Name, id);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while deleting {EntityName} entity with ID: {EntityId}", typeof(TEntity).Name, id);
+                throw;
+            }
+        }
+
+        public virtual async Task<TDto?> GetByIdAsync(Guid id)
+        {
+            _logger.LogInformation("Fetching {EntityName} entity with ID: {EntityId}", typeof(TEntity).Name, id);
+            try
+            {
+                var entity = await _context.Set<TEntity>().FindAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("{EntityName} entity with ID: {EntityId} not found.", typeof(TEntity).Name, id);
+                    return default;
+                }
+                _logger.LogInformation("{EntityName} entity with ID: {EntityId} fetched successfully.", typeof(TEntity).Name, id);
+                return default; // TODO: implement mapping to DTO _mapper.ToDto(entity)
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching {EntityName} entity with ID: {EntityId}", typeof(TEntity).Name, id);
+                throw;
+            }
+        }
+        public virtual async Task<IEnumerable<TDto>> GetAllAsync()
+        {
+            _logger.LogInformation("Fetching all {EntityName} entities from the database.", typeof(TEntity).Name);
+
+            try
+            {
+                var entities = await _context.Set<TEntity>().ToListAsync();
+
+                _logger.LogInformation("Fetched {Count} {EntityName} entities.", entities.Count, typeof(TEntity).Name);
+
+                if (entities == null || !entities.Any())
+                    return Enumerable.Empty<TDto>();
+
+                return new List<TDto>(); // TODO: implement mapping to DTOList _mapper.ToDtoList(entities)
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching {EntityName} entities.", typeof(TEntity).Name);
+                throw;
+            }
+        }
+
+        protected virtual async Task<bool> ExistsById(Guid id)
+        {
+            return await _context.Set<TEntity>().FindAsync(id) != null;
+        }
     }
 }

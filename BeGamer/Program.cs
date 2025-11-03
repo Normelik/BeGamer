@@ -29,7 +29,6 @@ builder.Services.AddIdentity<CustomUser, IdentityRole<Guid>>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddAllServices(Assembly.GetExecutingAssembly());
-builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
 
 builder.Services.AddAllServices(Assembly.GetExecutingAssembly());

@@ -37,7 +37,7 @@ namespace BeGamer.Services
                 var gameEvent = _gameEventMapper.ToEntity(createGameEventDTO);
 
                 // Assign a unique GUID using the GuidGenerator utility
-                gameEvent.Id = _guidGenerator.GenerateUniqueGuid(GameEventExistsById!);
+                gameEvent.Id = await _guidGenerator.GenerateUniqueGuid(GameEventExistsById!);
                 gameEvent.OrganizerId = id;
 
                 gameEvent.Location = await _context.Addresses.FindAsync(createGameEventDTO.LocationId);
@@ -191,9 +191,9 @@ namespace BeGamer.Services
                 return false;
             }
         }
-        private bool GameEventExistsById(Guid id)
+        private async Task<bool> GameEventExistsById(Guid id)
         {
-            return _context.GameEvents.Any(e => e.Id == id);
+            return await _context.GameEvents.FindAsync(id) != null;
         }
         // GET ALL EVENTS BY DISTANCE
         public async Task<List<GameEvent>> GetNearbyGameEvents(

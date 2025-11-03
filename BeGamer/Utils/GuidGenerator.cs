@@ -3,13 +3,16 @@
     public class GuidGenerator
     {
         public GuidGenerator() { }
-        public Guid GenerateUniqueGuid(Func<Guid, bool> existsById)
+        public async Task<Guid> GenerateUniqueGuid(Func<Guid, Task<bool>> existsById)
         {
-            Guid newGuid = Guid.NewGuid();
-            while (existsById(newGuid))
+            Guid newGuid;
+
+            do
             {
                 newGuid = Guid.NewGuid();
             }
+            while (await existsById(newGuid));
+
             return newGuid;
         }
 

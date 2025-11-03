@@ -2,7 +2,6 @@
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BeGamer.Controllers
 {
@@ -22,36 +21,36 @@ namespace BeGamer.Controllers
 
         // POST: api/Games
         [HttpPost]
-        public async Task<ActionResult<GameDTO?>> PostGame(CreateGameDTO createGameDTO)
-        {
-            _logger.LogInformation("API request received to create a new Game.");
+        //public async Task<ActionResult<GameDTO?>> PostGame(CreateGameDTO createGameDTO)
+        //{
+        //    _logger.LogInformation("API request received to create a new Game.");
 
-            // Input validation (basic, controller-level)
-            if (createGameDTO is null)
-            {
-                _logger.LogWarning("CreateGameDTO is null. Cannot create Game.");
-                return BadRequest("Wrong Game data were provided.");
-            }
+        //    // Input validation (basic, controller-level)
+        //    if (createGameDTO is null)
+        //    {
+        //        _logger.LogWarning("CreateGameDTO is null. Cannot create Game.");
+        //        return BadRequest("Wrong Game data were provided.");
+        //    }
 
-            try
-            {
-                var createdGame = await _GameService.CreateAsync(createGameDTO);
+        //    try
+        //    {
+        //        var createdGame = await _GameService.CreateAsync(createGameDTO);
 
-                if (createdGame == null)
-                {
-                    _logger.LogWarning("Game creation failed. Service returned null.");
-                    return StatusCode(500, "Failed to create Game.");
-                }
+        //        if (createdGame == null)
+        //        {
+        //            _logger.LogWarning("Game creation failed. Service returned null.");
+        //            return StatusCode(500, "Failed to create Game.");
+        //        }
 
-                _logger.LogInformation("Game with ID {GameId} was successfully created.", createdGame.GameId);
-                return Ok(createdGame);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while creating a new Game.");
-                return StatusCode(500, "An error occurred while processing your request.");
-            }
-        }
+        //        _logger.LogInformation("Game with ID {GameId} was successfully created.", createdGame.GameId);
+        //        return Ok(createdGame);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An error occurred while creating a new Game.");
+        //        return StatusCode(500, "An error occurred while processing your request.");
+        //    }
+        //}
 
         // GET: api/Games
         [HttpGet]
@@ -92,48 +91,48 @@ namespace BeGamer.Controllers
         }
 
         // PUT: api/Games/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGame(Guid id, UpdateGameDTO updateGameDTO)
-        {
-            _logger.LogInformation("API request received to update Game with ID: {GameId}", id);
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutGame(Guid id, UpdateGameDTO updateGameDTO)
+        //{
+        //    _logger.LogInformation("API request received to update Game with ID: {GameId}", id);
 
-            if (updateGameDTO == null)
-            {
-                _logger.LogWarning("Update request for Game ID {GameId} contained null payload.", id);
-                return BadRequest(new { message = "No Game data was provided for update." });
-            }
+        //    if (updateGameDTO == null)
+        //    {
+        //        _logger.LogWarning("Update request for Game ID {GameId} contained null payload.", id);
+        //        return BadRequest(new { message = "No Game data was provided for update." });
+        //    }
 
-            // Check if Game exists
-            if (!_GameService.ExistsById(id))
-            {
-                _logger.LogWarning("Game with ID {GameId} not found. Update aborted.", id);
-                return NotFound(new { message = $"Game with ID {id} was not found for update." });
-            }
+        //    // Check if Game exists
+        //    if (_GameService.ExistsById(id).Result == false)
+        //    {
+        //        _logger.LogWarning("Game with ID {GameId} not found. Update aborted.", id);
+        //        return NotFound(new { message = $"Game with ID {id} was not found for update." });
+        //    }
 
-            try
-            {
-                _logger.LogInformation("Updating Game with ID {GameId}...", id);
+        //    try
+        //    {
+        //        _logger.LogInformation("Updating Game with ID {GameId}...", id);
 
-                await _GameService.UpdateAsync(id, updateGameDTO);
+        //        await _GameService.UpdateAsync(id, updateGameDTO);
 
-                _logger.LogInformation("Game with ID {GameId} updated successfully.", id);
-                return NoContent();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                _logger.LogError(ex, "Concurrency error while updating Game with ID {GameId}", id);
-                return StatusCode(500, new
-                {
-                    message = $"A concurrency error occurred while updating the Game with ID {id}.",
-                    details = ex.Message
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error occurred while updating Game with ID {GameId}", id);
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
-            }
-        }
+        //        _logger.LogInformation("Game with ID {GameId} updated successfully.", id);
+        //        return NoContent();
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        _logger.LogError(ex, "Concurrency error while updating Game with ID {GameId}", id);
+        //        return StatusCode(500, new
+        //        {
+        //            message = $"A concurrency error occurred while updating the Game with ID {id}.",
+        //            details = ex.Message
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Unexpected error occurred while updating Game with ID {GameId}", id);
+        //        return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+        //    }
+        //}
 
         // DELETE: api/Games/{id}
         [HttpDelete("{id}")]
