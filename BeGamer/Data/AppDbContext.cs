@@ -63,7 +63,7 @@ public class AppDbContext : IdentityDbContext<CustomUser, IdentityRole<Guid>,Gui
         PasswordHasher<CustomUser> passwordHasher = new PasswordHasher<CustomUser>();
         var hashedPassword1 = passwordHasher.HashPassword(null, "password123");
         var hashedPassword2 = passwordHasher.HashPassword(null, "securepass");
-        // Ověření, zda už jsou data přítomná
+        
         if (!context.Game.Any())
         {
             context.Game.AddRange(
@@ -93,6 +93,7 @@ public class AppDbContext : IdentityDbContext<CustomUser, IdentityRole<Guid>,Gui
                 }
             );
         }
+
         if (!context.Users.Any())
         {
             context.Users.AddRange(
@@ -112,7 +113,7 @@ public class AppDbContext : IdentityDbContext<CustomUser, IdentityRole<Guid>,Gui
                 }
             );
         }
-        // seed the database with adresses
+        
         if (!context.Addresses.Any())
         {
             context.Addresses.AddRange(

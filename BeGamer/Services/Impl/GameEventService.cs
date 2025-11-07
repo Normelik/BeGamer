@@ -87,7 +87,7 @@ namespace BeGamer.Services
 
             try
             {
-                GameEventExistsById(id); // Check if GameEvents exists
+                await GameEventExistsById(id); // Check if GameEvents exists
 
                 var gameEvent = await _context.GameEvents.FirstOrDefaultAsync(u => u.Id == id);
 

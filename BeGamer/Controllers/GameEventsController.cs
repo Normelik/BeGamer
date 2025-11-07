@@ -2,7 +2,6 @@
 using BeGamer.Models;
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace BeGamer.Controllers

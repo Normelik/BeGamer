@@ -1,5 +1,4 @@
 ﻿using BeGamer.Data;
-using BeGamer.Mappers;
 using BeGamer.Services.Interfaces.common;
 using BeGamer.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -7,33 +6,34 @@ using Microsoft.EntityFrameworkCore;
 namespace BeGamer.Services.Impl.common
 {
 
-    public abstract class BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto> : IBaseAppService<TEntity, TDto, TCreateDto, TUpdateDto> where TEntity : class
+    public abstract class BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto, TRepository> : IBaseAppService<TEntity, TDto, TCreateDto, TUpdateDto, TRepository> where TEntity : class
     {
         protected readonly AppDbContext _context;
-        protected readonly DbSet<TEntity> _dbSet;
         protected readonly GuidGenerator _guidGenerator;
-        protected readonly ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto>> _logger;
-        protected readonly GameMapper _mapper;
+        protected readonly ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto, TRepository>> _logger;
 
-        public BaseAppService(AppDbContext context, ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto>> logger, GuidGenerator guidGenerator, GameMapper gameMapper)
+        public BaseAppService(
+            AppDbContext context,
+            ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto, TRepository>> logger,
+            GuidGenerator guidGenerator)
         {
             _context = context;
-            _dbSet = _context.Set<TEntity>();
-            _guidGenerator = guidGenerator;
             _logger = logger;
-            _mapper = gameMapper;
+            _guidGenerator = guidGenerator;
         }
-
 
         public abstract Task<TDto> CreateAsync(TCreateDto createDto);
 
         public abstract Task<TDto> UpdateAsync(Guid id, TUpdateDto updateDto);
+
+
 
         public virtual async Task<bool> DeleteAsync(Guid id)
         {
             _logger.LogInformation("Attempting to delete {EntityName} entity with ID: {EntityId}", typeof(TEntity).Name, id);
             try
             {
+                var entityExists = await _repository.
                 var entity = await _context.Set<TEntity>().FindAsync(id);
                 if (entity == null)
                 {
@@ -93,6 +93,7 @@ namespace BeGamer.Services.Impl.common
                 throw;
             }
         }
+
 
         protected virtual async Task<bool> ExistsById(Guid id)
         {

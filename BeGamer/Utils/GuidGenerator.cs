@@ -3,7 +3,7 @@
     public class GuidGenerator
     {
         public GuidGenerator() { }
-        public async Task<Guid> GenerateUniqueGuid(Func<Guid, Task<bool>> existsById)
+        public async Task<Guid> GenerateUniqueGuidAsync(Func<Guid, Task<bool>> existsById)
         {
             Guid newGuid;
 
