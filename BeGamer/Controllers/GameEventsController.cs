@@ -13,9 +13,11 @@ namespace BeGamer.Controllers
         private readonly IGameEventService _gameEventService;
         private readonly ILogger<GameEventsController> _logger;
 
-        public GameEventsController(IGameEventService GameEventService, ILogger<GameEventsController> logger)
+        public GameEventsController(
+            IGameEventService gameEventService,
+            ILogger<GameEventsController> logger)
         {
-            _gameEventService = GameEventService;
+            _gameEventService = gameEventService;
             _logger = logger;
         }
 
@@ -27,7 +29,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var gameEvents = await _gameEventService.GetAllGameEventsAsync();
+                var gameEvents = await _gameEventService.GetAllAsync();
 
                 _logger.LogInformation("Successfully returned {Count} GameEvents.", gameEvents.Count());
                 return Ok(gameEvents);
@@ -45,7 +47,7 @@ namespace BeGamer.Controllers
         {
             _logger.LogInformation("API request received to get GameEvent with ID: {GameEventId}", id);
 
-            var gameEvent = await _gameEventService.GetGameEventById(id);
+            var gameEvent = await _gameEventService.GetByIdAsync(id);
 
             if (gameEvent == null)
             {
@@ -122,7 +124,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var success = await _gameEventService.DeleteGameEvent(id);
+                var success = await _gameEventService.DeleteAsync(id);
 
                 if (success)
                 {

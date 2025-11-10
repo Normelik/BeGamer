@@ -1,17 +1,14 @@
 ﻿using BeGamer.DTOs.GameEvent;
 using BeGamer.Models;
+using BeGamer.Services.common;
 
 namespace BeGamer.Services.Interfaces
 {
-    public interface IGameEventService
+    public interface IGameEventService : IBaseAppService<GameEvent,GameEventDTO, CreateGameEventDTO, UpdateGameEventDTO>
     {
-        Task<IEnumerable<GameEventDTO>> GetAllGameEventsAsync();
-        Task<GameEventDTO> GetGameEventById(Guid id);
         Task<GameEventDTO> CreateGameEvent(Guid id, CreateGameEventDTO createGameEventDTO);
         Task<GameEventDTO> UpdateGameEvent(Guid id, GameEventDTO gameEventDto);
-        Task<bool> DeleteGameEvent(Guid id);
-
-        Task<List<GameEvent>> GetNearbyGameEvents(double userLatitude,
+        Task<IReadOnlyList<GameEvent>> GetNearbyGameEvents(double userLatitude,
                                             double userLongitude,
                                             double distanceInMeters);
     }

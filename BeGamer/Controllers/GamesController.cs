@@ -10,12 +10,14 @@ namespace BeGamer.Controllers
     [AllowAnonymous]
     public class GamesController : ControllerBase
     {
-        private readonly IGameService _GameService;
+        private readonly IGameService _gameService;
         private readonly ILogger<GamesController> _logger;
 
-        public GamesController(IGameService GameService, ILogger<GamesController> logger)
+        public GamesController(
+            IGameService GameService,
+            ILogger<GamesController> logger)
         {
-            _GameService = GameService;
+            _gameService = GameService;
             _logger = logger;
         }
 
@@ -60,7 +62,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var Games = await _GameService.GetAllAsync();
+                var Games = await _gameService.GetAllAsync();
 
                 _logger.LogInformation("Successfully returned {Count} Games.", Games.Count());
                 return Ok(Games);
@@ -78,9 +80,26 @@ namespace BeGamer.Controllers
         {
             _logger.LogInformation("API request received to get Game with ID: {GameId}", id);
 
-            var currentGame = await _GameService.GetByIdAsync(id);
+            try
+            {
+                if (id == Guid.Empty)
+                {
+                    _logger.LogWarning("Invalid Game ID: {GameId} provided.", id);
+                    return BadRequest("Invalid Game ID provided.");
+                }
 
-            if (currentGame == null)
+                var game = await _gameService.GetByIdAsync(id);
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while validating Game ID: {GameId}", id);
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+            var currentGame = await _gameService.GetByIdAsync(id);
+
+            if (currentGame is null)
             {
                 _logger.LogWarning("API request: Game with ID: {GameId} not found.", id);
                 return NotFound();
@@ -142,7 +161,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var success = await _GameService.DeleteAsync(id);
+                var success = await _gameService.DeleteAsync(id);
 
                 if (success)
                 {

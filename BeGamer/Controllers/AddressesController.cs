@@ -25,7 +25,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var addresses = await _addressService.GetAllAddressesAsync();
+                var addresses = await _addressService.GetAllAsync();
 
                 _logger.LogInformation("Successfully returned {Count} addreses.", addresses.Count());
                 return Ok(addresses);

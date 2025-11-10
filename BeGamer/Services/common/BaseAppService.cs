@@ -1,25 +1,27 @@
-﻿using BeGamer.Data;
-using BeGamer.Services.Interfaces.common;
+﻿using AutoMapper;
+using BeGamer.Repositories.common;
 using BeGamer.Utils;
-using Microsoft.EntityFrameworkCore;
 
-namespace BeGamer.Services.Impl.common
+namespace BeGamer.Services.common
 {
 
-    public abstract class BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto, TRepository> : IBaseAppService<TEntity, TDto, TCreateDto, TUpdateDto, TRepository> where TEntity : class
+    public abstract class BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto> : IBaseAppService<TEntity, TDto, TCreateDto, TUpdateDto> where TEntity : class
     {
-        protected readonly AppDbContext _context;
         protected readonly GuidGenerator _guidGenerator;
-        protected readonly ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto, TRepository>> _logger;
+        protected readonly IMapper _mapper;
+        protected readonly IGenericRepository<TEntity> _genericRepository;
+        protected readonly ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto>> _logger;
 
         public BaseAppService(
-            AppDbContext context,
-            ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto, TRepository>> logger,
-            GuidGenerator guidGenerator)
+            GuidGenerator guidGenerator,
+            IMapper mapper,
+            IGenericRepository<TEntity> genericRepository,
+            ILogger<BaseAppService<TEntity, TDto, TCreateDto, TUpdateDto>> logger)
         {
-            _context = context;
-            _logger = logger;
             _guidGenerator = guidGenerator;
+            _mapper = mapper;
+            _genericRepository = genericRepository;
+            _logger = logger;
         }
 
         public abstract Task<TDto> CreateAsync(TCreateDto createDto);
@@ -33,15 +35,14 @@ namespace BeGamer.Services.Impl.common
             _logger.LogInformation("Attempting to delete {EntityName} entity with ID: {EntityId}", typeof(TEntity).Name, id);
             try
             {
-                var entityExists = await _repository.
-                var entity = await _context.Set<TEntity>().FindAsync(id);
+                var entity = await _genericRepository.FindByIdAsync(id);
                 if (entity == null)
                 {
                     _logger.LogWarning("{EntityName} entity with ID: {EntityId} not found. Deletion aborted.", typeof(TEntity).Name, id);
                     return false;
                 }
-                _context.Set<TEntity>().Remove(entity);
-                await _context.SaveChangesAsync();
+                await _genericRepository.DeleteAsync(entity);
+                await _genericRepository.SaveChangesAsync();
                 _logger.LogInformation("{EntityName} entity with ID: {EntityId} deleted successfully.", typeof(TEntity).Name, id);
                 return true;
             }
@@ -57,14 +58,14 @@ namespace BeGamer.Services.Impl.common
             _logger.LogInformation("Fetching {EntityName} entity with ID: {EntityId}", typeof(TEntity).Name, id);
             try
             {
-                var entity = await _context.Set<TEntity>().FindAsync(id);
+                var entity = await _genericRepository.FindByIdAsync(id);
                 if (entity == null)
                 {
                     _logger.LogWarning("{EntityName} entity with ID: {EntityId} not found.", typeof(TEntity).Name, id);
-                    return default;
+                    return _mapper.Map<TDto>(entity);
                 }
                 _logger.LogInformation("{EntityName} entity with ID: {EntityId} fetched successfully.", typeof(TEntity).Name, id);
-                return default; // TODO: implement mapping to DTO _mapper.ToDto(entity)
+                return _mapper.Map<TDto>(entity); 
             }
             catch (Exception ex)
             {
@@ -78,7 +79,7 @@ namespace BeGamer.Services.Impl.common
 
             try
             {
-                var entities = await _context.Set<TEntity>().ToListAsync();
+                var entities = await _genericRepository.GetAllAsync();
 
                 _logger.LogInformation("Fetched {Count} {EntityName} entities.", entities.Count, typeof(TEntity).Name);
 
@@ -95,9 +96,9 @@ namespace BeGamer.Services.Impl.common
         }
 
 
-        protected virtual async Task<bool> ExistsById(Guid id)
+        public virtual async Task<bool> ExistsById(Guid id)
         {
-            return await _context.Set<TEntity>().FindAsync(id) != null;
+            return await _genericRepository.ExistsById(id);
         }
     }
 }

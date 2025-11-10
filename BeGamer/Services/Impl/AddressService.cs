@@ -1,45 +1,32 @@
-﻿using BeGamer.Data;
+﻿using AutoMapper;
+using BeGamer.DTOs.Address;
 using BeGamer.Models;
+using BeGamer.Repositories.Interfaces;
+using BeGamer.Services.common;
 using BeGamer.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using BeGamer.Utils;
 
 namespace BeGamer.Services
 {
 
-    public class AddressService : IAddressService
+    public class AddressService : BaseAppService<Address, AddressDTO, CreateAddressDTO, UpdateAddressDTO>, IAddressService
     {
-        private readonly ILogger<AddressService> _logger;
-        private readonly AppDbContext _context;
-
-        public AddressService(ILogger<AddressService> logger, AppDbContext context)
+        public AddressService(
+            GuidGenerator guidGenerator,
+            IMapper mapper,
+            IAddressRepository repository,
+            ILogger<AddressService> logger
+        ) : base(guidGenerator, mapper, repository, logger)
         {
-            _logger = logger;
-            _context = context;
+        }
+        public override Task<AddressDTO> CreateAsync(CreateAddressDTO createDto)
+        {
+            throw new NotImplementedException();
         }
 
-        // GET ALL Addresses
-        public async Task<IEnumerable<Address>> GetAllAddressesAsync()
+        public override Task<AddressDTO> UpdateAsync(Guid id, UpdateAddressDTO updateDto)
         {
-
-            _logger.LogInformation("Fetching all Addresses from the database.");
-
-            try
-            {
-                var addresses = await _context.Addresses.ToListAsync();
-                _logger.LogInformation("Fetched {Count} Addreses from the database.", addresses.Count);
-
-                if (addresses == null || !addresses.Any())
-                {
-                    return Enumerable.Empty<Address>();
-                }
-
-                return addresses;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while fetching addresses.");
-                throw;
-            }
+            throw new NotImplementedException();
         }
     }
 }

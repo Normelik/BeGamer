@@ -1,6 +1,6 @@
 ﻿using BeGamer.DTOs.Game;
 using BeGamer.Models;
-using BeGamer.Services.Interfaces.common;
+using BeGamer.Services.common;
 
 namespace BeGamer.Services.Interfaces
 {

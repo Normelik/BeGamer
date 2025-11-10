@@ -1,4 +1,5 @@
-﻿using BeGamer.Data;
+﻿using AutoMapper;
+using BeGamer.Data;
 using BeGamer.DTOs.Auth;
 using BeGamer.DTOs.User;
 using BeGamer.Mappers;
@@ -12,14 +13,18 @@ namespace BeGamer.Services
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
-        private readonly UserMapper _userMapper;
+        private readonly IMapper _mapper;
         private readonly ILogger<UserService> _logger;
         private readonly IPasswordHasher<CustomUser> _passwordHasher;
 
-        public UserService(AppDbContext context, UserMapper userMapper, ILogger<UserService> logger, IPasswordHasher<CustomUser> passwordHasher)
+        public UserService(
+            AppDbContext context,
+            IMapper mapper,
+            ILogger<UserService> logger,
+            IPasswordHasher<CustomUser> passwordHasher)
         {
             _context = context;
-            _userMapper = userMapper;
+            _mapper = mapper;
             _logger = logger;
             _passwordHasher = passwordHasher;
         }
@@ -30,7 +35,7 @@ namespace BeGamer.Services
             _logger.LogInformation("Creating a new user with username: {Username}", registerUserDTO.Username);
             try
             {
-                var user = _userMapper.ToModel(registerUserDTO);
+                var user = _mapper.Map<CustomUser>(registerUserDTO);
                 user.Id = Guid.NewGuid(); // Assign a new GUID
                 user.PasswordHash = _passwordHasher.HashPassword(user, registerUserDTO.Password);
 
@@ -45,7 +50,7 @@ namespace BeGamer.Services
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("User with ID: {UserId} successfully created.", user.Id);
 
-                return _userMapper.ToDTO(user);
+                return _mapper.Map<UserDTO>(user);
             }
             catch (Exception ex)
             {
@@ -64,7 +69,7 @@ namespace BeGamer.Services
                 var users = await _context.Users.ToListAsync();
                 _logger.LogInformation("Fetched {Count} users from the database.", users.Count);
 
-                return _userMapper.ToDTOList(users);
+                return _mapper.Map<IEnumerable<UserDTO>>(users);
             }
             catch (Exception ex)
             {
@@ -91,7 +96,7 @@ namespace BeGamer.Services
                 }
 
                 _logger.LogInformation("User with ID: {UserId} successfully fetched.", id);
-                return _userMapper.ToDTO(user);
+                return _mapper.Map<UserDTO>(user);
             }
             catch (Exception ex)
             {
@@ -131,15 +136,13 @@ namespace BeGamer.Services
 
                 _logger.LogInformation("User with ID: {UserId} found. Updating fields...", id);
 
-                // Buď ručně:
-                user.UserName = updateUserDTO.Username;
-                user.Nickname = updateUserDTO.Nickname;
+                _mapper.Map(updateUserDTO, user);
 
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation("User with ID: {UserId} successfully updated.", id);
 
-                return _userMapper.ToDTO(user);
+                return _mapper.Map<UserDTO>(user);
             }
             catch (Exception ex)
             {

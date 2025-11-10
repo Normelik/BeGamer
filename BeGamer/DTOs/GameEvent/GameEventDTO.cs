@@ -1,11 +1,11 @@
-﻿using BeGamer.Models;
+﻿using BeGamer.DTOs.Address;
 
 namespace BeGamer.DTOs.GameEvent
 {
     public record GameEventDTO(
       Guid Id,
       string Title,
-      Address Location,
+      AddressDTO Location,
       DateTime DateEvent,
       Guid OrganizerID, // CustomUser Id
       int MaxPlayers,

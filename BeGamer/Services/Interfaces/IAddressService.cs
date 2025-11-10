@@ -1,9 +1,10 @@
-﻿using BeGamer.Models;
+﻿using BeGamer.DTOs.Address;
+using BeGamer.Models;
+using BeGamer.Services.common;
 
 namespace BeGamer.Services.Interfaces
 {
-    public interface IAddressService
+    public interface IAddressService : IBaseAppService<Address,AddressDTO, CreateAddressDTO, UpdateAddressDTO>
     {
-        Task<IEnumerable<Address>> GetAllAddressesAsync();
     }
 }

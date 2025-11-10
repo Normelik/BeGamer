@@ -1,33 +1,27 @@
-﻿using BeGamer.Data;
+﻿using AutoMapper;
 using BeGamer.DTOs.Game;
-using BeGamer.Mappers;
 using BeGamer.Models;
-using BeGamer.Repositories;
 using BeGamer.Repositories.common;
-using BeGamer.Services.Impl.common;
+using BeGamer.Repositories.Interfaces;
+using BeGamer.Services.common;
 using BeGamer.Services.Interfaces;
 using BeGamer.Utils;
-using Microsoft.EntityFrameworkCore;
 
 namespace BeGamer.Services
 {
-    public class GameService : BaseAppService<Game, GameDTO, CreateGameDTO, UpdateGameDTO, IGameRepository>, IGameService
+    public class GameService : BaseAppService<Game, GameDTO, CreateGameDTO, UpdateGameDTO>, IGameService
     {
-        private readonly GameMapper _gameMapper;
-        private readonly GenericRepository<Game> _gameRepository;
-
 
         public GameService(
-            AppDbContext context,
-            ILogger<GameService> logger,
             GuidGenerator guidGenerator,
-            GameMapper gameMapper,
-            GenericRepository<Game> genericRepository)
-            : base(context, logger, guidGenerator)
+            IMapper mapper,
+            IGameRepository repository,
+            ILogger<GameService> logger
+        ) : base(guidGenerator, mapper,repository, logger)
         {
-            _gameMapper = gameMapper;
-            _gameRepository = genericRepository;
         }
+
+
 
         public override async Task<GameDTO> CreateAsync(CreateGameDTO createDto)
         {
@@ -35,21 +29,22 @@ namespace BeGamer.Services
 
             try
             {
-                if (createDto == null) {
+                if (createDto == null)
+                {
                     _logger.LogWarning("CreateGameDTO is null. Aborting creation.");
                     throw new ArgumentNullException(nameof(createDto), "CreateGameDTO cannot be null");
                 }
 
-                Game? game = _gameMapper.ToEntity(createDto);
+                Game? game = _mapper.Map<CreateGameDTO, Game>(createDto);
 
                 // Assign a unique GUID using the GuidGenerator utility
                 game.Id = await _guidGenerator.GenerateUniqueGuidAsync(ExistsById);
 
-                var createdGame = await _gameRepository.CreateAsync(game);
+                var createdGame = await _genericRepository.CreateAsync(game);
 
                 _logger.LogInformation("Game with ID: {GameId} successfully created.", game.Id);
 
-                return _gameMapper.ToDTO(createdGame);
+                return _mapper.Map<Game, GameDTO>(createdGame);
             }
             catch (Exception ex)
             {
@@ -64,7 +59,7 @@ namespace BeGamer.Services
 
             try
             {
-                var game = await _context.Set<Game>().FirstOrDefaultAsync(u => u.Id == id);
+                var game = await _genericRepository.FindByIdAsync(id);
 
                 if (game == null)
                 {
@@ -75,13 +70,13 @@ namespace BeGamer.Services
                 _logger.LogInformation("Game with ID: {GameId} found. Updating fields...", id);
 
                 // Buď ručně:
-                _gameMapper.ToExistingEntity(updateDto, game);
+                Game? updatedGame = _mapper.Map<UpdateGameDTO, Game>(updateDto);
 
-                await _context.SaveChangesAsync();
+                await _genericRepository.SaveChangesAsync();
 
                 _logger.LogInformation("Game with ID: {GameId} successfully updated.", id);
 
-                return _gameMapper.ToDTO(game);
+                return _mapper.Map<Game, GameDTO>(updatedGame);
             }
             catch (Exception ex)
             {

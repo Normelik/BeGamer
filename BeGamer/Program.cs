@@ -1,25 +1,24 @@
+using AutoMapper;
 using BeGamer.Config;
 using BeGamer.Data;
 using BeGamer.Mappers;
 using BeGamer.Models;
-using BeGamer.Services;
-using BeGamer.Services.Interfaces;
-using BeGamer.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers((options =>
+builder.Services.AddControllers(options =>
 {
     var policy = new AuthorizationPolicyBuilder()
                      .RequireAuthenticatedUser()
                      .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
-}));
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -28,10 +27,14 @@ builder.Services.AddIdentity<CustomUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddAllServices(Assembly.GetExecutingAssembly());
-builder.Services.AddAuthorization();
+// Mapper
+builder.Services.AddAutoMapper(cf => cf.AddProfile<GenericMapper>());
 
 builder.Services.AddAllServices(Assembly.GetExecutingAssembly());
+
+
+// Authentication & Authorization
+builder.Services.AddAuthorization();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // CORS
@@ -62,7 +65,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// seed database with testingdata
+// seed database with testing data
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
