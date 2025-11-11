@@ -97,11 +97,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                //var GameEvent = await _gameEventService.CreateGameEvent(Guid.Parse(userId!), createGameEventDTO);
-
-                var gameEvent = await _gameEventService.CreateAsync(createGameEventDTO);
-
+                GameEventDTO gameEvent = await _gameEventService.CreateAsync(createGameEventDTO);
 
                 if (gameEvent is null)
                 {

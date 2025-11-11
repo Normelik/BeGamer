@@ -5,7 +5,6 @@ using BeGamer.Repositories.Interfaces;
 using BeGamer.Services.common;
 using BeGamer.Services.Interfaces;
 using BeGamer.Utils;
-using System.Security.Claims;
 
 namespace BeGamer.Services
 {
@@ -33,35 +32,6 @@ namespace BeGamer.Services
             _userService = userService;
             _authService = authService;
         }
-
-
-        //// CREATE EVENT
-        //public async Task<GameEventDTO> CreateGameEvent(Guid id, CreateGameEventDTO createGameEventDTO)
-        //{
-        //    _logger.LogInformation("Start creating new GameEvent.");
-
-        //    try
-        //    {
-        //        GameEvent gameEvent = _mapper.Map<GameEvent>(createGameEventDTO);
-
-        //        // Assign a unique GUID using the GuidGenerator utility
-        //        gameEvent.Id = await _guidGenerator.GenerateUniqueGuidAsync(ExistsById);
-        //        gameEvent.OrganizerId = id;
-
-        //        gameEvent.Location = await _addressRepository.FindByIdAsync(createGameEventDTO.LocationId);
-
-        //        await _genericRepository.CreateAsync(gameEvent);
-        //        await _genericRepository.SaveChangesAsync();
-        //        _logger.LogInformation("GameEvent with ID: {GameEventId} successfully created.", gameEvent.Id);
-
-        //        return _mapper.Map<GameEventDTO>(gameEvent);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "An error occurred while creating a new GameEvent.");
-        //        throw;
-        //    }
-        //}
 
         //// UPDATE EVENT
         //public async Task<GameEventDTO?> UpdateGameEvent(Guid id, UpdateGameEventDTO updateGameEventDTO)
@@ -112,21 +82,21 @@ namespace BeGamer.Services
         //    double lonRad = userLongitude * Math.PI / 180;
 
         //    var nearbyEvents = await _genericRepository.GetAllAsync();
-            // TODO: query to get only events within distanceInMeters
-            //var nearbyEvents = await _context.GameEvents
-            //    .Include(e => e.Location)
-            //    .Where(e => e.Location != null &&
-            //        (
-            //            2 * R * Math.Asin(
-            //                Math.Sqrt(
-            //                    Math.Pow(Math.Sin(((e.Location.Latitude * Math.PI / 180) - latRad) / 2), 2) +
-            //                    (Math.Cos(latRad) * Math.Cos(e.Location.Latitude * Math.PI / 180) *
-            //                    Math.Pow(Math.Sin(((e.Location.Longitude * Math.PI / 180) - lonRad) / 2), 2))
-            //                )
-            //            )
-            //        ) <= distanceInMeters
-            //    )
-            //    .ToListAsync();
+        // TODO: query to get only events within distanceInMeters
+        //var nearbyEvents = await _context.GameEvents
+        //    .Include(e => e.Location)
+        //    .Where(e => e.Location != null &&
+        //        (
+        //            2 * R * Math.Asin(
+        //                Math.Sqrt(
+        //                    Math.Pow(Math.Sin(((e.Location.Latitude * Math.PI / 180) - latRad) / 2), 2) +
+        //                    (Math.Cos(latRad) * Math.Cos(e.Location.Latitude * Math.PI / 180) *
+        //                    Math.Pow(Math.Sin(((e.Location.Longitude * Math.PI / 180) - lonRad) / 2), 2))
+        //                )
+        //            )
+        //        ) <= distanceInMeters
+        //    )
+        //    .ToListAsync();
 
         //    return nearbyEvents;
         //}
