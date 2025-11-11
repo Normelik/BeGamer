@@ -14,16 +14,19 @@ namespace BeGamer.Services
         private readonly IUserService _userService;
         private readonly UserManager<CustomUser> _userManager;
         private readonly ILogger<AuthService> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AuthService(IJwtTokenService jwtTokenService,
                             IUserService userService,
                             UserManager<CustomUser> userManager,
-                            ILogger<AuthService> logger)
+                            ILogger<AuthService> logger,
+                            IHttpContextAccessor httpContextAccessor)
         {
             _jwtTokenService = jwtTokenService;
             _userService = userService;
             _userManager = userManager;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ResponseTokenDTO?> LoginAsync(LoginDTO loginDTO)
@@ -92,6 +95,16 @@ namespace BeGamer.Services
                 _logger.LogError(ex, "Unexpected error while registering user: {Username}", registerUserDTO.Username);
                 throw;
             }
+        }
+
+        public async Task<CustomUser?> GetAssignedUserAsync()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            var username = user?.Identity?.Name;
+            if (username is null)
+                return null;
+
+            return await _userService.GetUserByUsernameAsync(username);
         }
     }
 }

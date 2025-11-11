@@ -5,5 +5,6 @@ namespace BeGamer.Repositories.Interfaces
 {
     public interface IGameEventRepository : IGenericRepository<GameEvent>
     {
+        Task<GameEvent?> GetGameEventByIdWithParticipantsAsync(Guid id);
     }
 }

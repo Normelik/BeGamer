@@ -49,7 +49,7 @@ namespace BeGamer.Controllers
 
             var gameEvent = await _gameEventService.GetByIdAsync(id);
 
-            if (gameEvent == null)
+            if (gameEvent is null)
             {
                 _logger.LogWarning("API request: GameEvent with ID: {GameEventId} not found.", id);
                 return NotFound();
@@ -60,27 +60,27 @@ namespace BeGamer.Controllers
         }
 
         // PUT: api/GameEvents/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGameEvent(GameEventDTO gameEventDTO)
-        {
-            if (gameEventDTO == null)
-            {
-                _logger.LogWarning("GameEventDTO is null. Cannot update GameEvent.");
-                return BadRequest("Wrong GameEvent data were provided.");
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutGameEvent(Guid id, UpdateGameEventDTO updateGameEventDTO)
+        //{
+        //    if (updateGameEventDTO is null)
+        //    {
+        //        _logger.LogWarning("UpdateGameEventDTO is null. Cannot update GameEvent.");
+        //        return BadRequest("Wrong UpdateGameEventDTO data were provided.");
+        //    }
 
-            try
-            {
-                await _gameEventService.UpdateGameEvent(gameEventDTO.Id, gameEventDTO);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while updating GameEvent with ID: {GameEventId}", gameEventDTO.Id);
-                return StatusCode(500, "An error occurred while processing your request.");
-            }
+        //    try
+        //    {
+        //        await _gameEventService.UpdateGameEvent(id, updateGameEventDTO);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An error occurred while updating GameEvent with ID: {GameEventId}", id);
+        //        return StatusCode(500, "An error occurred while processing your request.");
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // POST: api/GameEvents
         [HttpPost]
@@ -89,7 +89,7 @@ namespace BeGamer.Controllers
             _logger.LogInformation("API request received to create a new GameEvent.");
 
             // Input validation 
-            if (createGameEventDTO == null)
+            if (createGameEventDTO is null)
             {
                 _logger.LogWarning("CreateGameEventDTO is null. Cannot create GameEvent.");
                 return BadRequest("Wrong GameEvent data were provided.");
@@ -97,17 +97,20 @@ namespace BeGamer.Controllers
 
             try
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var GameEvent = await _gameEventService.CreateGameEvent(Guid.Parse(userId!), createGameEventDTO);
+                //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                //var GameEvent = await _gameEventService.CreateGameEvent(Guid.Parse(userId!), createGameEventDTO);
 
-                if (GameEvent == null)
+                var gameEvent = await _gameEventService.CreateAsync(createGameEventDTO);
+
+
+                if (gameEvent is null)
                 {
                     _logger.LogWarning("GameEvent creation failed. Service returned null.");
                     return StatusCode(500, "Failed to create GameEvent.");
                 }
 
-                _logger.LogInformation("GameEvent with ID {GameEventId} was successfully created.", GameEvent.Id);
-                return CreatedAtAction(nameof(GetGameEventById), new { id = GameEvent.Id }, GameEvent);
+                _logger.LogInformation("GameEvent with ID {GameEventId} was successfully created.", gameEvent.Id);
+                return CreatedAtAction(nameof(GetGameEventById), new { id = gameEvent.Id }, gameEvent);
             }
             catch (Exception ex)
             {

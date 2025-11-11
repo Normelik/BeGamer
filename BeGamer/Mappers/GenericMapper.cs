@@ -18,13 +18,19 @@ namespace BeGamer.Mappers
 
             //Address Mappings
             CreateMap<Address, AddressDTO>().ReverseMap();
+            CreateMap<Address, CreateAddressDTO>().ReverseMap();
+            CreateMap<Address, UpdateAddressDTO>().ReverseMap();
 
             //GameEvent Mappings
             CreateMap<GameEvent, GameEventDTO>().ReverseMap();
             CreateMap<GameEvent, CreateGameEventDTO>().ReverseMap();
+            CreateMap<GameEvent, UpdateGameEventDTO>().ReverseMap();
+            
 
             //User Mappings
             CreateMap<CustomUser, UserDTO>().ReverseMap();
+            CreateMap<CustomUser, CreateUserDTO>().ReverseMap();
+            CreateMap<CustomUser, UpdateUserDTO>().ReverseMap();
 
         }
     }

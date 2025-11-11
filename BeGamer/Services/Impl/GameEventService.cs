@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using BeGamer.DTOs.GameEvent;
 using BeGamer.Models;
-using BeGamer.Repositories.common;
 using BeGamer.Repositories.Interfaces;
 using BeGamer.Services.common;
 using BeGamer.Services.Interfaces;
 using BeGamer.Utils;
+using System.Security.Claims;
 
 namespace BeGamer.Services
 {
@@ -13,93 +13,105 @@ namespace BeGamer.Services
     {
 
         private readonly IAddressRepository _addressRepository;
+        private readonly IGameEventRepository _gameEventRepository;
+        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
 
         public GameEventService(
             IGameEventRepository genericRepository,
             IAddressRepository addressRepository,
             IMapper mapper,
             GuidGenerator guidGenerator,
-            ILogger<GameEventService> logger) 
+            ILogger<GameEventService> logger,
+            IGameEventRepository gameEventRepository,
+            IUserService userService,
+            IAuthService authService)
             : base(guidGenerator, mapper, genericRepository, logger)
         {
             _addressRepository = addressRepository;
+            _gameEventRepository = gameEventRepository;
+            _userService = userService;
+            _authService = authService;
         }
 
 
-        // CREATE EVENT
-        public async Task<GameEventDTO> CreateGameEvent(Guid id, CreateGameEventDTO createGameEventDTO)
-        {
-            _logger.LogInformation("Start creating new GameEvent.");
+        //// CREATE EVENT
+        //public async Task<GameEventDTO> CreateGameEvent(Guid id, CreateGameEventDTO createGameEventDTO)
+        //{
+        //    _logger.LogInformation("Start creating new GameEvent.");
 
-            try
-            {
-                GameEvent gameEvent = _mapper.Map<GameEvent>(createGameEventDTO);
+        //    try
+        //    {
+        //        GameEvent gameEvent = _mapper.Map<GameEvent>(createGameEventDTO);
 
-                // Assign a unique GUID using the GuidGenerator utility
-                gameEvent.Id = await _guidGenerator.GenerateUniqueGuidAsync(ExistsById);
-                gameEvent.OrganizerId = id;
+        //        // Assign a unique GUID using the GuidGenerator utility
+        //        gameEvent.Id = await _guidGenerator.GenerateUniqueGuidAsync(ExistsById);
+        //        gameEvent.OrganizerId = id;
 
-                gameEvent.Location = await _addressRepository.FindByIdAsync(createGameEventDTO.LocationId);
+        //        gameEvent.Location = await _addressRepository.FindByIdAsync(createGameEventDTO.LocationId);
 
-                await _genericRepository.CreateAsync(gameEvent);
-                await _genericRepository.SaveChangesAsync();
-                _logger.LogInformation("GameEvent with ID: {GameEventId} successfully created.", gameEvent.Id);
+        //        await _genericRepository.CreateAsync(gameEvent);
+        //        await _genericRepository.SaveChangesAsync();
+        //        _logger.LogInformation("GameEvent with ID: {GameEventId} successfully created.", gameEvent.Id);
 
-                return _mapper.Map<GameEventDTO>(gameEvent);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while creating a new GameEvent.");
-                throw;
-            }
-        }
+        //        return _mapper.Map<GameEventDTO>(gameEvent);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An error occurred while creating a new GameEvent.");
+        //        throw;
+        //    }
+        //}
 
-        // UPDATE EVENT
-        public async Task<GameEventDTO?> UpdateGameEvent(Guid id, GameEventDTO gameEventDto)
-        {
-            _logger.LogInformation("Attempting to update GameEvent with ID: {GameEventId}", id);
+        //// UPDATE EVENT
+        //public async Task<GameEventDTO?> UpdateGameEvent(Guid id, UpdateGameEventDTO updateGameEventDTO)
+        //{
+        //    _logger.LogInformation("Attempting to update GameEvent with ID: {GameEventId}", id);
 
-            try
-            {
-                await ExistsById(id); // Check if GameEvent exists
+        //    try
+        //    {
+        //        await ExistsById(id); // Check if GameEvent exists
 
-                var gameEvent = await _genericRepository.FindByIdAsync(id);
+        //        //var gameEvent = await _genericRepository.FindByIdAsync(id);
+        //        var gameEvent = await _gameEventRepository.GetGameEventByIdWithParticipantsAsync(id);
 
-                if (gameEvent == null)
-                {
-                    _logger.LogWarning("GameEvent with ID: {GameEventId} not found.", id);
-                    return null;
-                }
+        //        if (gameEvent == null)
+        //        {
+        //            _logger.LogWarning("GameEvent with ID: {GameEventId} not found.", id);
+        //            return null;
+        //        }
 
-                _logger.LogInformation("GameEvent with ID: {GameEventId} found. Updating fields...", id);
+        //        _logger.LogInformation("GameEvent with ID: {GameEventId} found. Updating fields...", id);
 
-                // Update fields
-                _mapper.Map(gameEventDto, gameEvent);
+        //        // Update fields
+        //        _mapper.Map(updateGameEventDTO, gameEvent);
 
-                await _genericRepository.SaveChangesAsync();
 
-                _logger.LogInformation("GameEvent with ID: {GameEventId} successfully updated.", id);
 
-                return _mapper.Map<GameEventDTO>(gameEvent);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while updating GameEvent with ID: {GameEventId}", id);
-                throw;
-            }
-        }
+        //        await _genericRepository.SaveChangesAsync();
 
-        // GET ALL EVENTS BY DISTANCE
-        public async Task<IEnumerable<GameEvent>> GetNearbyGameEvents(
-                                            double userLatitude,
-                                            double userLongitude,
-                                            double distanceInMeters)
-        {
-            double R = 6371000; // Poloměr Země v metrech
-            double latRad = userLatitude * Math.PI / 180;
-            double lonRad = userLongitude * Math.PI / 180;
+        //        _logger.LogInformation("GameEvent with ID: {GameEventId} successfully updated.", id);
 
-            var nearbyEvents = await _genericRepository.GetAllAsync();  
+        //        return _mapper.Map<GameEventDTO>(gameEvent);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An error occurred while updating GameEvent with ID: {GameEventId}", id);
+        //        throw;
+        //    }
+        //}
+
+        //// GET ALL EVENTS BY DISTANCE
+        //public async Task<IEnumerable<GameEvent>> GetNearbyGameEvents(
+        //                                    double userLatitude,
+        //                                    double userLongitude,
+        //                                    double distanceInMeters)
+        //{
+        //    double R = 6371000; // Poloměr Země v metrech
+        //    double latRad = userLatitude * Math.PI / 180;
+        //    double lonRad = userLongitude * Math.PI / 180;
+
+        //    var nearbyEvents = await _genericRepository.GetAllAsync();
             // TODO: query to get only events within distanceInMeters
             //var nearbyEvents = await _context.GameEvents
             //    .Include(e => e.Location)
@@ -116,12 +128,41 @@ namespace BeGamer.Services
             //    )
             //    .ToListAsync();
 
-            return nearbyEvents;
-        }
+        //    return nearbyEvents;
+        //}
 
-        public override Task<GameEventDTO> CreateAsync(CreateGameEventDTO createDto)
+        public async override Task<GameEventDTO> CreateAsync(CreateGameEventDTO createDto)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Start creating new GameEvent.");
+
+            try
+            {
+                GameEvent gameEvent = _mapper.Map<GameEvent>(createDto);
+
+                // Assign a unique GUID using the GuidGenerator utility
+                gameEvent.Id = await _guidGenerator.GenerateUniqueGuidAsync(ExistsById);
+
+                // Get the assigned user (organizer)
+                CustomUser? assignedUser = await _authService.GetAssignedUserAsync();
+                if (assignedUser == null)
+                {
+                    _logger.LogError("Assigned user is null. Cannot create GameEvent without organizer.");
+                    throw new InvalidOperationException("Assigned user is null. Cannot create GameEvent without organizer.");
+                }
+                gameEvent.OrganizerId = assignedUser.Id;
+
+                gameEvent.Location = await _addressRepository.FindByIdAsync(createDto.LocationId);
+
+                await _genericRepository.CreateAsync(gameEvent);
+                _logger.LogInformation("GameEvent with ID: {GameEventId} successfully created.", gameEvent.Id);
+
+                return _mapper.Map<GameEventDTO>(gameEvent);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating a new GameEvent.");
+                throw;
+            }
         }
 
         public async override Task<GameEventDTO> UpdateAsync(Guid id, UpdateGameEventDTO updateDto)

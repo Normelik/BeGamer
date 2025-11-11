@@ -209,6 +209,7 @@ namespace BeGamer.Services
                 var user = _context.Users
                     .Include(u => u.OrganizedEvents)
                     .FirstOrDefault(u => u.Id == id);
+
                 if (user == null)
                 {
                     _logger.LogWarning("User with ID: {UserId} not found.", id);
