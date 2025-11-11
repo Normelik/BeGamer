@@ -1,10 +1,8 @@
 ﻿using BeGamer.Mappers;
 using BeGamer.Models;
-using BeGamer.Repositories.common;
 using BeGamer.Repositories.Impl;
 using BeGamer.Repositories.Interfaces;
 using BeGamer.Services;
-using BeGamer.Services.common;
 using BeGamer.Services.Interfaces;
 using BeGamer.Utils;
 using Microsoft.AspNetCore.Identity;
@@ -16,12 +14,12 @@ public static class ApplicationServicesRegistration
     {
 
         // SERVICES
-        services.AddScoped<IAuthService,AuthService>();
-        services.AddScoped<IJwtTokenService,JwtTokenService>();
-        services.AddScoped<IUserService,UserService>();
-        services.AddScoped<IGameEventService,GameEventService>();
-        services.AddScoped<IGameService,GameService>();
-        services.AddScoped<IAddressService,AddressService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IGameEventService, GameEventService>();
+        services.AddScoped<IGameService, GameService>();
+        services.AddScoped<IAddressService, AddressService>();
 
         //REPOSITORIES
 
