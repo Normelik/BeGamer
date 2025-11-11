@@ -145,44 +145,44 @@ namespace BeGamer.Controllers
         }
 
         // GET: api/GameEvents/nearby?lat=50.0&lon=14.0&distance=1000
-        [HttpGet("nearby")]
-        public async Task<ActionResult<List<GameEvent>>> GetNearby(
-            [FromQuery] double lat,
-            [FromQuery] double lon,
-            [FromQuery] double distance)
-        {
-            _logger.LogInformation(
-                "API request received to get nearby GameEvents. Latitude: {Latitude}, Longitude: {Longitude}, Distance: {Distance}m",
-                lat, lon, distance);
+        //[HttpGet("nearby")]
+        //public async Task<ActionResult<List<GameEvent>>> GetNearby(
+        //    [FromQuery] double lat,
+        //    [FromQuery] double lon,
+        //    [FromQuery] double distance)
+        //{
+        //    _logger.LogInformation(
+        //        "API request received to get nearby GameEvents. Latitude: {Latitude}, Longitude: {Longitude}, Distance: {Distance}m",
+        //        lat, lon, distance);
 
-            try
-            {
-                var nearbyEvents = await _gameEventService.GetNearbyGameEvents(lat, lon, distance);
+        //    try
+        //    {
+        //        var nearbyEvents = await _gameEventService.GetNearbyGameEvents(lat, lon, distance);
 
-                if (nearbyEvents == null || !nearbyEvents.Any())
-                {
-                    _logger.LogWarning(
-                        "No GameEvents found near location ({Latitude}, {Longitude}) within {Distance} meters.",
-                        lat, lon, distance);
+        //        if (nearbyEvents == null || !nearbyEvents.Any())
+        //        {
+        //            _logger.LogWarning(
+        //                "No GameEvents found near location ({Latitude}, {Longitude}) within {Distance} meters.",
+        //                lat, lon, distance);
 
-                    return NotFound("No nearby GameEvents found.");
-                }
+        //            return NotFound("No nearby GameEvents found.");
+        //        }
 
-                _logger.LogInformation(
-                    "{Count} GameEvents found near location ({Latitude}, {Longitude}) within {Distance} meters.",
-                    nearbyEvents.Count, lat, lon, distance);
+        //        _logger.LogInformation(
+        //            "{Count} GameEvents found near location ({Latitude}, {Longitude}) within {Distance} meters.",
+        //            nearbyEvents.Count(), lat, lon, distance);
 
-                return Ok(nearbyEvents);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "An error occurred while attempting to retrieve nearby GameEvents at ({Latitude}, {Longitude}) within {Distance} meters.",
-                    lat, lon, distance);
+        //        return Ok(nearbyEvents);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(
+        //            ex,
+        //            "An error occurred while attempting to retrieve nearby GameEvents at ({Latitude}, {Longitude}) within {Distance} meters.",
+        //            lat, lon, distance);
 
-                return StatusCode(500, "An error occurred while processing your request.");
-            }
-        }
+        //        return StatusCode(500, "An error occurred while processing your request.");
+        //    }
+        //}
     }
 }

@@ -81,12 +81,12 @@ namespace BeGamer.Services.common
             {
                 var entities = await _genericRepository.GetAllAsync();
 
-                _logger.LogInformation("Fetched {Count} {EntityName} entities.", entities.Count, typeof(TEntity).Name);
+                _logger.LogInformation("Fetched {Count} {EntityName} entities.", entities.Count(), typeof(TEntity).Name);
 
                 if (entities == null || !entities.Any())
                     return Enumerable.Empty<TDto>();
 
-                return new List<TDto>(); // TODO: implement mapping to DTOList _mapper.ToDtoList(entities)
+                 return _mapper.Map<IEnumerable<TDto>>(entities);
             }
             catch (Exception ex)
             {

@@ -90,7 +90,7 @@ namespace BeGamer.Services
         }
 
         // GET ALL EVENTS BY DISTANCE
-        public async Task<IReadOnlyList<GameEvent>> GetNearbyGameEvents(
+        public async Task<IEnumerable<GameEvent>> GetNearbyGameEvents(
                                             double userLatitude,
                                             double userLongitude,
                                             double distanceInMeters)

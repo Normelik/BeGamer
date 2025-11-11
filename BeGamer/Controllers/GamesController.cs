@@ -23,36 +23,35 @@ namespace BeGamer.Controllers
 
         // POST: api/Games
         [HttpPost]
-        //public async Task<ActionResult<GameDTO?>> PostGame(CreateGameDTO createGameDTO)
-        //{
-        //    _logger.LogInformation("API request received to create a new Game.");
+        public async Task<ActionResult<GameDTO?>> PostGame(CreateGameDTO createGameDTO)
+        {
+            _logger.LogInformation("API request received to create a new Game.");
 
-        //    // Input validation (basic, controller-level)
-        //    if (createGameDTO is null)
-        //    {
-        //        _logger.LogWarning("CreateGameDTO is null. Cannot create Game.");
-        //        return BadRequest("Wrong Game data were provided.");
-        //    }
+            if (createGameDTO is null)
+            {
+                _logger.LogWarning("CreateGameDTO is null. Cannot create Game.");
+                return BadRequest("Wrong Game data were provided.");
+            }
 
-        //    try
-        //    {
-        //        var createdGame = await _GameService.CreateAsync(createGameDTO);
+            try
+            {
+                var createdGame = await _gameService.CreateAsync(createGameDTO);
 
-        //        if (createdGame == null)
-        //        {
-        //            _logger.LogWarning("Game creation failed. Service returned null.");
-        //            return StatusCode(500, "Failed to create Game.");
-        //        }
+                if (createdGame == null)
+                {
+                    _logger.LogWarning("Game creation failed. Service returned null.");
+                    return StatusCode(500, "Failed to create Game.");
+                }
 
-        //        _logger.LogInformation("Game with ID {GameId} was successfully created.", createdGame.GameId);
-        //        return Ok(createdGame);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "An error occurred while creating a new Game.");
-        //        return StatusCode(500, "An error occurred while processing your request.");
-        //    }
-        //}
+                _logger.LogInformation("Game with ID {GameId} was successfully created.", createdGame.Id);
+                return Ok(createdGame);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating a new Game.");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
 
         // GET: api/Games
         [HttpGet]
@@ -90,23 +89,14 @@ namespace BeGamer.Controllers
 
                 var game = await _gameService.GetByIdAsync(id);
 
-
+                _logger.LogInformation("API request: Game with ID: {GameId} returned successfully.", id);
+                return Ok(game);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while validating Game ID: {GameId}", id);
                 return StatusCode(500, "An error occurred while processing your request.");
             }
-            var currentGame = await _gameService.GetByIdAsync(id);
-
-            if (currentGame is null)
-            {
-                _logger.LogWarning("API request: Game with ID: {GameId} not found.", id);
-                return NotFound();
-            }
-
-            _logger.LogInformation("API request: Game with ID: {GameId} returned successfully.", id);
-            return Ok(currentGame);
         }
 
         // PUT: api/Games/{id}

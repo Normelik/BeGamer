@@ -35,12 +35,13 @@ namespace BeGamer.Services
                     throw new ArgumentNullException(nameof(createDto), "CreateGameDTO cannot be null");
                 }
 
-                Game? game = _mapper.Map<CreateGameDTO, Game>(createDto);
+                Game game = _mapper.Map<CreateGameDTO, Game>(createDto);
 
+                _logger.LogInformation("Game with ID: {GameId} successfully created.", game.ToString());
                 // Assign a unique GUID using the GuidGenerator utility
                 game.Id = await _guidGenerator.GenerateUniqueGuidAsync(ExistsById);
 
-                var createdGame = await _genericRepository.CreateAsync(game);
+                Game createdGame = await _genericRepository.CreateAsync(game);
 
                 _logger.LogInformation("Game with ID: {GameId} successfully created.", game.Id);
 

@@ -2,11 +2,12 @@
 
 namespace BeGamer.DTOs.Game
 {
-    public record GameDTO(
-        Guid GameId,
-        string Title,
-        int MinPlayers,
-        int MaxPlayers,
-        BoardGameType Type)
-    {};
+    public record GameDTO
+    {
+        public Guid Id { get; init; }
+        public string Title { get; init; } = string.Empty;
+        public int MinPlayers { get; init; }
+        public int MaxPlayers { get; init; }
+        public BoardGameType Type { get; init; }
+    }
 }

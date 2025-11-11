@@ -8,7 +8,7 @@ namespace BeGamer.Services.Interfaces
     {
         Task<GameEventDTO> CreateGameEvent(Guid id, CreateGameEventDTO createGameEventDTO);
         Task<GameEventDTO> UpdateGameEvent(Guid id, GameEventDTO gameEventDto);
-        Task<IReadOnlyList<GameEvent>> GetNearbyGameEvents(double userLatitude,
+        Task<IEnumerable<GameEvent>> GetNearbyGameEvents(double userLatitude,
                                             double userLongitude,
                                             double distanceInMeters);
     }

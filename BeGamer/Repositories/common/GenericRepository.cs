@@ -18,10 +18,9 @@ namespace BeGamer.Repositories.common
 
         public async Task<T> CreateAsync(T entity)
         {
-            if (entity == null)
+            if (entity is not null)
             {
                 await _dbSet.AddAsync(entity!);
-                //await _context.Set<T>().AddAsync(entity);
                 await _context.SaveChangesAsync();
                 return entity!;
             }
@@ -58,7 +57,7 @@ namespace BeGamer.Repositories.common
 
 
 
-        public async Task<IReadOnlyList<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _context.Set<T>().ToListAsync();
         }
