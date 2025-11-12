@@ -17,6 +17,8 @@ public class AppDbContext : IdentityDbContext<CustomUser, IdentityRole<Guid>,Gui
     {
     }
 
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

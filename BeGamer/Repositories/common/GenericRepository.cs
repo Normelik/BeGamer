@@ -71,9 +71,16 @@ namespace BeGamer.Repositories.common
         {
             throw new NotImplementedException();
         }
-        public Task DeleteAsync(T entity)
+        public async Task<bool> DeleteAsync(T entity)
         {
-            throw new NotImplementedException();
+            if (entity == null)
+            {
+                return false;
+            }
+
+            _context.Set<T>().Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
     }

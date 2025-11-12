@@ -107,6 +107,11 @@ namespace BeGamer.Controllers
 
                 _logger.LogInformation("GameEvent with ID {GameEventId} was successfully created.", gameEvent.Id);
                 return CreatedAtAction(nameof(GetGameEventById), new { id = gameEvent.Id }, gameEvent);
+            }catch (ArgumentException ix)
+            {
+                _logger.LogError(ix, "Invalid data provided for creating GameEvent.");
+                return BadRequest(ix.Message);
+
             }
             catch (Exception ex)
             {
