@@ -1,13 +1,11 @@
 ﻿using BeGamer.DTOs.Game;
 using BeGamer.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BeGamer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
     public class GamesController : ControllerBase
     {
         private readonly IGameService _gameService;
@@ -35,7 +33,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var createdGame = await _gameService.CreateAsync(createGameDTO);
+                GameDTO createdGame = await _gameService.CreateAsync(createGameDTO);
 
                 if (createdGame == null)
                 {
@@ -88,6 +86,12 @@ namespace BeGamer.Controllers
                 }
 
                 var game = await _gameService.GetByIdAsync(id);
+
+                if(game is null)
+                {
+                    _logger.LogWarning("Game with ID: {GameId} was not found.", id);
+                    return NotFound();
+                }
 
                 _logger.LogInformation("API request: Game with ID: {GameId} returned successfully.", id);
                 return Ok(game);

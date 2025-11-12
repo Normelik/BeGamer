@@ -17,6 +17,7 @@ namespace BeGamer.DTOs.Game
         public int MaxPlayers { get; init; }
 
         [Required(ErrorMessage = "Type of game is required")]
+        [Range(1, 11, ErrorMessage = "Board game type must be between 1 and 11.")] // Enum boardGameType
         public BoardGameType Type { get; init; }
     }
 }

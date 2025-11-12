@@ -1,5 +1,5 @@
-﻿using BeGamer.Models;
-using BeGamer.Services;
+﻿using BeGamer.DTOs.Address;
+using BeGamer.Models;
 using BeGamer.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +26,7 @@ namespace BeGamer.Controllers
 
             try
             {
-                var addresses = await _addressService.GetAllAsync();
+                IEnumerable<AddressDTO> addresses = await _addressService.GetAllAsync();
 
                 _logger.LogInformation("Successfully returned {Count} addresses.", addresses.Count());
                 return Ok(addresses);
@@ -34,6 +34,38 @@ namespace BeGamer.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while retrieving addresses.");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
+        //GET: api/Addresses
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<AddressDTO>>> GetAddress(Guid id)
+        {
+            _logger.LogInformation("API request received to get Address with ID: {AddressId}", id);
+
+            try
+            {
+                if (id == Guid.Empty)
+                {
+                    _logger.LogWarning("Invalid Address ID: {GameId} provided.", id);
+                    return BadRequest($"Invalid Address with ID {id} provided.");
+                }
+
+                AddressDTO? address = await _addressService.GetByIdAsync(id);
+
+                if (address is null)
+                {
+                    _logger.LogWarning("Address with ID: {AddressId} not found.", id);
+                    return NotFound($"Address with ID {id} not found.");
+                }
+
+                _logger.LogInformation("API request: Address with ID: {AddressId} returned successfully.", id);
+                return Ok(address);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while validating Address ID: {AddressId}", id);
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
